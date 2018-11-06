@@ -2,18 +2,19 @@
 
 ## Usage
 
-To import the annotations and `Service` abstract class add `flutter_bloc` to your `pubspec.yaml`.
+To import the annotations and `Service` abstract class add `flutter_bloc_annotations` to your
+`pubspec.yaml`.
 
 ```yaml
 dependencies:
-  flutter_bloc: <latest_version>
+  flutter_bloc_annotations: <latest_version>
 ```
 
 ## Import Requirements
 
-`flutter_bloc` uses `InheritedWidget`, `StatefulWidget`, `State`, `Widget` and `BuildContext` from
-`package:flutter/material.dart`. This needs to be imported as the generated `part` file cannot have
-import statements. Any `services` that are used also need to be imported.
+`flutter_bloc_annotations` uses `InheritedWidget`, `StatefulWidget`, `State`, `Widget` and
+`BuildContext` from `package:flutter/material.dart`. This needs to be imported as the generated
+`part` file cannot have import statements. Any `services` that are used also need to be imported.
 
 ## Class Member Requirements
 
