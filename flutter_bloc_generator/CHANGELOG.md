@@ -1,3 +1,8 @@
+## 0.1.3
+
+* Format code
+* Add example
+
 ## 0.1.2
 
 * Fix latest value updater for initial data
