@@ -6,7 +6,7 @@ targets:
 
 builders:
   flutter_bloc:
-    import: "package:flutter_bloc_generator/builder.dart"
+    import: "package:flutter_bloc_generator/flutter_bloc_generator.dart"
     build_extensions: {".dart": [".bloc.dart"]}
     builder_factories: ["bloc"]
     auto_apply: dependents
