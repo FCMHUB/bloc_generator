@@ -1,0 +1,15 @@
+.DS_Store
+.dart_tool/
+
+**/.packages
+**/*.bloc.dart
+**/.metadata
+**/.pub/
+**/packages
+**/pubspec.lock
+*.iml
+
+**/build
+**/ios/.generated/
+**/ios/Flutter/Generated.xcconfig
+**/ios/Runner/GeneratedPluginRegistrant.*

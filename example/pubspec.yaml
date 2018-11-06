@@ -1,0 +1,23 @@
+name: flutter_bloc_example
+description: A project used to demo the BLoC generator
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc:
+    path: ../flutter_bloc/
+  rxdart: ^0.19.0
+
+dev_dependencies:
+  build_runner: 1.0.0
+  flutter_test:
+    sdk: flutter
+  flutter_bloc_generator:
+    path: ../flutter_bloc_generator/
+
+flutter:
+  uses-material-design: true
