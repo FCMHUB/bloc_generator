@@ -1,7 +1,7 @@
 name: flutter_bloc
 description: Automatic BLoC generator for flutter.
 version: 0.1.0
-author: Callum Iddon
+author: Callum Iddon <iddoncallum@gmail.com>
 homepage: https://github.com/CallumIddon/flutter_bloc_generator/
 
 environment:

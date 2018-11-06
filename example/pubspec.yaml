@@ -1,6 +1,8 @@
 name: flutter_bloc_example
 description: A project used to demo the BLoC generator
 version: 1.0.0
+author: Callum Iddon <iddoncallum@gmail.com>
+homepage: https://github.com/CallumIddon/flutter_bloc_generator/
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
