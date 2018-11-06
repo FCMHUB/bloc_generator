@@ -48,6 +48,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 		String controllersDisposer = "";
 
 		String values = "";
+		String valueUpdaters = "";
 
 		String mappers = "";
 
@@ -92,7 +93,13 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 								  "$inputType get $name => _$inputName;  \n";
 
 						getMetadata(element, "@BLoCValue").forEach((ElementAnnotation metadata) {
-							currentValues[findInputs(metadata)[0]] = name;
+							String output = findInputs(metadata)[0];
+							currentValues[output] = name;
+							valueUpdaters += """
+								_$output.stream.listen((inputData) {
+									_$inputName = inputData;
+								});
+							""";
 						});
 					}
 
@@ -112,15 +119,12 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 					if(findMetadata(element, "@BLoCMapper")) {
 						getMetadata(element, "@BLoCMapper").forEach((ElementAnnotation metadata) {
 							List<String> inputs = findInputs(metadata);
-							String type = findType(element);
 							String name = findName(element);
 							String value = currentValues[inputs[1]];
 							
 							mappers += """
 								_${inputs[0]}.stream.listen((inputData) {
-									$type newData = template.$name(inputData, $value);
-									_$value = newData;
-									_${inputs[1]}.sink.add(newData);
+									_${inputs[1]}.sink.add(template.$name(inputData, $value));
 								});
 							""";
 						});
@@ -143,6 +147,8 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 					$controllersInit
 
 					$mappers
+
+					$valueUpdaters
 
 					$servicesInit
 				}
