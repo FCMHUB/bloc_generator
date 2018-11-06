@@ -10,130 +10,124 @@ import "package:flutter_bloc_generator/src/classFinder.dart";
 import "package:flutter_bloc_generator/src/metadata.dart";
 
 class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
-	BuilderOptions options;
-	BLoCGenerator(this.options);
+  BuilderOptions options;
+  BLoCGenerator(this.options);
 
-	@override
-	Stream<String> generateForAnnotatedElement(
-		Element element, ConstantReader annotation, BuildStep buildStep) async* {
-		final String name = element.name[0] == "_" ? element.name.substring(1) : element.name;
-		final String bloc = "${name}BLoC";
+  @override
+  Stream<String> generateForAnnotatedElement(
+      Element element, ConstantReader annotation, BuildStep buildStep) async* {
+    final String name =
+        element.name[0] == "_" ? element.name.substring(1) : element.name;
+    final String bloc = "${name}BLoC";
 
-		final Map<String, Map<String, String>> servicesList = <String, Map<String, String>>{};
-		if(findMetadata(element, "@BLoCService")) {
-			getMetadata(element, "@BLoCService").forEach((ElementAnnotation metadata) {
-				List<String> inputs = findInputs(metadata);
-				servicesList[inputs[0]] = {
-					"name": "_${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
-					"input": inputs[1]
-				};
-			});
-		}
+    final Map<String, Map<String, String>> servicesList =
+        <String, Map<String, String>>{};
+    if (findMetadata(element, "@BLoCService")) {
+      getMetadata(element, "@BLoCService")
+          .forEach((ElementAnnotation metadata) {
+        List<String> inputs = findInputs(metadata);
+        servicesList[inputs[0]] = {
+          "name": "_${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
+          "input": inputs[1]
+        };
+      });
+    }
 
-		String services = "";
-		String servicesInit = "";
-		String servicesDispose = "";
-		
-		servicesList.keys.forEach((String service) {
-			final String serviceName = servicesList[service]["name"];
-			final String inputName = servicesList[service]["input"];
+    String services = "";
+    String servicesInit = "";
+    String servicesDispose = "";
 
-			services += "$service $serviceName = $service();\n";
-			servicesInit += "$serviceName.init($inputName);\n";
-			servicesDispose += "$serviceName.dispose();\n";
-		});
+    servicesList.keys.forEach((String service) {
+      final String serviceName = servicesList[service]["name"];
+      final String inputName = servicesList[service]["input"];
 
-		String controllers = "";
-		String controllersInit = "";
-		String controllersDisposer = "";
+      services += "$service $serviceName = $service();\n";
+      servicesInit += "$serviceName.init($inputName);\n";
+      servicesDispose += "$serviceName.dispose();\n";
+    });
 
-		String values = "";
-		String valueUpdaters = "";
+    String controllers = "";
+    String controllersInit = "";
+    String controllersDisposer = "";
 
-		String mappers = "";
+    String values = "";
+    String valueUpdaters = "";
 
-		Map<String, String> currentValues = <String, String>{};
+    String mappers = "";
 
-		element.visitChildren(
-			ClassFinder(
-				field: (Element element) {
-					String inputType = findType(element);
-					String inputName = findName(element);
+    Map<String, String> currentValues = <String, String>{};
 
-					bool isInput = findMetadata(element, "@BLoCInput");
-					bool isOutput = findMetadata(element, "@BLoCOutput");
-					bool isValue = findMetadata(element, "@BLoCValue");
+    element.visitChildren(ClassFinder(field: (Element element) {
+      String inputType = findType(element);
+      String inputName = findName(element);
 
-					String templateType;
-					if(isInput || isOutput) {
-						templateType = findTemplateType(element);
-					}
+      bool isInput = findMetadata(element, "@BLoCInput");
+      bool isOutput = findMetadata(element, "@BLoCOutput");
+      bool isValue = findMetadata(element, "@BLoCValue");
 
-					String name;
-					if(isInput) {
-						name = inputName[0] == "_" ?
-							   inputName.substring(1) :
-							   inputName;
-					} else if(isOutput) {
-						name = inputName[0] == "_" ?
-							   inputName.substring(1) :
-							   inputName;
-					} else if(isValue) {
-						name = inputName[0] == "_" ?
-							   inputName.substring(1) :
-							   inputName;
-					}
+      String templateType;
+      if (isInput || isOutput) {
+        templateType = findTemplateType(element);
+      }
 
-					if(isInput || isOutput) {
-						controllers += "$inputType _$inputName;\n";
-						controllersInit += "_$inputName = template.$inputName;\n";
+      String name;
+      if (isInput) {
+        name = inputName[0] == "_" ? inputName.substring(1) : inputName;
+      } else if (isOutput) {
+        name = inputName[0] == "_" ? inputName.substring(1) : inputName;
+      } else if (isValue) {
+        name = inputName[0] == "_" ? inputName.substring(1) : inputName;
+      }
 
-					} else if(isValue) {
-						values += "$inputType _$inputName;               \n"
-								  "$inputType get $name => _$inputName;  \n";
+      if (isInput || isOutput) {
+        controllers += "$inputType _$inputName;\n";
+        controllersInit += "_$inputName = template.$inputName;\n";
+      } else if (isValue) {
+        values += "$inputType _$inputName;               \n"
+            "$inputType get $name => _$inputName;  \n";
 
-						getMetadata(element, "@BLoCValue").forEach((ElementAnnotation metadata) {
-							String output = findInputs(metadata)[0];
-							currentValues[output] = name;
-							valueUpdaters += """
+        getMetadata(element, "@BLoCValue")
+            .forEach((ElementAnnotation metadata) {
+          String output = findInputs(metadata)[0];
+          currentValues[output] = name;
+          valueUpdaters += """
 								_$output.stream.listen((inputData) {
 									_$inputName = inputData;
 								});
 							""";
-						});
-					}
+        });
+      }
 
-					if(isInput) {
-						controllers += "Sink<$templateType> get $name => _$inputName.sink;\n";
-					}
-					if(isOutput) {
-						controllers += "Stream<$templateType> get $name => _$inputName.stream;\n";
-					}
+      if (isInput) {
+        controllers += "Sink<$templateType> get $name => _$inputName.sink;\n";
+      }
+      if (isOutput) {
+        controllers +=
+            "Stream<$templateType> get $name => _$inputName.stream;\n";
+      }
 
-					if(isInput || isOutput) {
-						controllers += "\n";
-						controllersDisposer += "_$inputName?.close();\n";
-					}
-				},
-				method: (Element element) {
-					if(findMetadata(element, "@BLoCMapper")) {
-						getMetadata(element, "@BLoCMapper").forEach((ElementAnnotation metadata) {
-							List<String> inputs = findInputs(metadata);
-							String name = findName(element);
-							String value = currentValues[inputs[1]];
-							
-							mappers += """
+      if (isInput || isOutput) {
+        controllers += "\n";
+        controllersDisposer += "_$inputName?.close();\n";
+      }
+    }, method: (Element element) {
+      if (findMetadata(element, "@BLoCMapper")) {
+        getMetadata(element, "@BLoCMapper")
+            .forEach((ElementAnnotation metadata) {
+          List<String> inputs = findInputs(metadata);
+          String name = findName(element);
+          String value = currentValues[inputs[1]];
+
+          mappers += """
 								_${inputs[0]}.stream.listen((inputData) {
 									_${inputs[1]}.sink.add(template.$name(inputData, $value));
 								});
 							""";
-						});
-					}
-				}
-			)
-		);
+        });
+      }
+    }));
 
-		yield """
+    yield """
 			class $bloc {
 				${element.name} template = ${element.name}();
 
@@ -160,11 +154,11 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 			}
 		""";
 
-		final bool buildProvider = annotation.read("provider").boolValue;
-		final String provider = "${name}Provider";
+    final bool buildProvider = annotation.read("provider").boolValue;
+    final String provider = "${name}Provider";
 
-		if(buildProvider) {
-			yield """
+    if (buildProvider) {
+      yield """
 				class $provider extends InheritedWidget {
 					final Widget child;
 					final $bloc bloc;
@@ -183,14 +177,14 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 					bool updateShouldNotify(InheritedWidget old) => old.child != child;
 				}
 			""";
-		}
+    }
 
-		final bool buildDisposer = annotation.read("disposer").boolValue;
-		final String disposer = "${name}Disposer";
-		final String disposerState = "_${disposer}State";
+    final bool buildDisposer = annotation.read("disposer").boolValue;
+    final String disposer = "${name}Disposer";
+    final String disposerState = "_${disposer}State";
 
-		if(buildDisposer) {
-			yield """
+    if (buildDisposer) {
+      yield """
 				class $disposer extends StatefulWidget {
 					final Widget child;
 
@@ -220,6 +214,6 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 					}
 				}
 			""";
-		}
-	}
+    }
+  }
 }

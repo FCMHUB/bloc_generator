@@ -1,4 +1,4 @@
 abstract class Service<T> {
-	void init(Sink<T> sink);
-	void dispose();
+  void init(Sink<T> sink);
+  void dispose();
 }
