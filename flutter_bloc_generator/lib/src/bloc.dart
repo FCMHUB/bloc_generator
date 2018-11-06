@@ -4,7 +4,7 @@ import "package:analyzer/dart/element/element.dart";
 import "package:build/src/builder/build_step.dart";
 import "package:source_gen/source_gen.dart";
 
-import "package:flutter_bloc/flutter_bloc.dart";
+import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 
 import "package:flutter_bloc_generator/src/classFinder.dart";
 import "package:flutter_bloc_generator/src/metadata.dart";

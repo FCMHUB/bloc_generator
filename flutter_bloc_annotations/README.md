@@ -47,7 +47,7 @@ testable without creating a an entire `BLoC` to add to as they only require a `S
 // main.dart
 import "dart:async";
 import "package:flutter/material.dart";
-import "package:flutter_bloc/flutter_bloc.dart";
+import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 import "service.dart";
 part "main.bloc.dart";
 
@@ -70,7 +70,7 @@ class _Test {
 
 ```dart
 // service.dart
-import "package:flutter_bloc/flutter_bloc.dart";
+import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 
 class TestService extends Service<int> {
   @override

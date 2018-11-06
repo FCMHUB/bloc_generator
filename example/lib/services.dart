@@ -1,4 +1,4 @@
-import "package:flutter_bloc/flutter_bloc.dart";
+import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 
 class SetService extends Service<int> {
 	@override
