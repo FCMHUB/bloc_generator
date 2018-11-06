@@ -1,2 +1,1 @@
-flutter format lib/
-flutter packages pub release
+flutter format lib/ && flutter packages pub publish
