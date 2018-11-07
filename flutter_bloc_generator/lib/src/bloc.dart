@@ -83,8 +83,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
         controllers += "$inputType _$inputName;\n";
         controllersInit += "_$inputName = template.$inputName;\n";
       } else if (isValue) {
-        values += "$inputType _$inputName;               \n"
-            "$inputType get $name => _$inputName;  \n";
+        values += "$inputType get $name => template.$inputName;\n\n";
 
         getMetadata(element, "@BLoCValue")
             .forEach((ElementAnnotation metadata) {
@@ -92,7 +91,6 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
           currentValues[output] = name;
           valueUpdaters += """
 								_$output.stream.listen((inputData) {
-									_$inputName = inputData;
 									template.$inputName = inputData;
 								});
 							""";

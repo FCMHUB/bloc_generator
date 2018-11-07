@@ -1,3 +1,7 @@
+## 0.1.9
+
+* Make template value the only current value stored
+
 ## 0.1.8
 
 * Moved value updater before calling mappers
