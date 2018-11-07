@@ -26,7 +26,7 @@ class _Test {
 // service.dart
 import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 
-class TestService extends Service<int> {
+class TestService extends InputService<int> {
   @override
   void init(Sink<int> sink) async {
     await Future.delayed(Duration(seconds: 10));

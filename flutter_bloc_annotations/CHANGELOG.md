@@ -1,3 +1,12 @@
+## 0.1.4
+
+* Changed Service to InputService and added OutputService
+* Corrected name in README
+
+## 0.1.3
+
+* Fix README discrepencies
+
 ## 0.1.2
 
 * Added documentation comments

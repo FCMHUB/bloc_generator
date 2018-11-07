@@ -1,6 +1,7 @@
+import "dart:async";
 import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 
-class SetService extends Service<int> {
+class SetService extends InputService<int> {
 	@override
 	void init(Sink<int> sink) async {
 		await Future.delayed(Duration(seconds: 10));
@@ -11,13 +12,18 @@ class SetService extends Service<int> {
 	void dispose() {}
 }
 
-class AddService extends Service<int> {
+class PrintService extends OutputService<String> {
+	StreamSubscription<String> subscription;
+
 	@override
-	void init(Sink<int> sink) async {
-		await Future.delayed(Duration(seconds: 20));
-		sink.add(5);
+	void init(Stream<String> stream) async {
+		subscription = stream.listen((String inputData) {
+			print("Counter set to: $inputData");
+		});
 	}
 
 	@override
-	void dispose() {}
+	void dispose() {
+		subscription?.cancel();
+	}
 }

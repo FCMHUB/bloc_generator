@@ -7,7 +7,7 @@ part "bloc.bloc.dart";
 
 @BLoC()
 @BLoCService("SetService", "setCounter")
-@BLoCService("AddService", "addToCounter")
+@BLoCService("PrintService", "counter")
 class _Test {
 	@BLoCInput()
 	StreamController<int> setCounter = StreamController<int>();
