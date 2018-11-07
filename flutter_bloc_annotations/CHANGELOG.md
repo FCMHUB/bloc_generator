@@ -1,3 +1,7 @@
+## 0.1.5
+
+* Updated service documentation
+
 ## 0.1.4
 
 * Changed Service to InputService and added OutputService

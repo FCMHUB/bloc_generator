@@ -44,14 +44,13 @@ class BLoCMapper {
         assert(outputName != null);
 }
 
-/// Specifies a class that extends a service to be instantiated and initialized on the BLoCs
-/// instantiation.
-/// Outputs from the service will be added to the [inputName] stream
+/// Specifies a service to be used by the BLoC with name [serviceName] and will conntext to the
+/// Stream or Sink of the [controllerName] based on if it is an input or output service
 class BLoCService {
   final String serviceName;
-  final String inputName;
+  final String controllerName;
 
-  const BLoCService(this.serviceName, this.inputName)
+  const BLoCService(this.serviceName, this.controllerName)
       : assert(serviceName != null),
-        assert(inputName != null);
+        assert(controllerName != null);
 }

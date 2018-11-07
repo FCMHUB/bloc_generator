@@ -27,7 +27,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
           .forEach((ElementAnnotation metadata) {
         List<String> inputs = findInputs(metadata);
         servicesList[inputs[0]] = {
-          "name": "_${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
+          "name": "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
           "input": inputs[1]
         };
       });
