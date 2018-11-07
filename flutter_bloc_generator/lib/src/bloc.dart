@@ -93,6 +93,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
           valueUpdaters += """
 								_$output.stream.listen((inputData) {
 									_$inputName = inputData;
+									template.$inputName = inputData;
 								});
 							""";
         });
@@ -139,9 +140,9 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 				$bloc() {
 					$controllersInit
 
-					$mappers
-
 					$valueUpdaters
+
+					$mappers
 
 					$servicesInit
 				}

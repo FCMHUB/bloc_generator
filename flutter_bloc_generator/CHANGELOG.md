@@ -1,3 +1,8 @@
+## 0.1.8
+
+* Moved value updater before calling mappers
+* Updating latest values on template
+
 ## 0.1.7
 
 * OutputService automatic listener
