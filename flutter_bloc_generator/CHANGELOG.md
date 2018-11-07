@@ -1,6 +1,10 @@
-## 0.1.4
+## 0.1.5
 
 * Made services public members
+
+## 0.1.4
+
+* Changed Service to InputService and added OutputService
 
 ## 0.1.3
 
