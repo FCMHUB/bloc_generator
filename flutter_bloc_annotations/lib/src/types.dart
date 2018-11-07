@@ -1,3 +1,6 @@
+import "dart:async";
+import "package:meta/meta.dart";
+
 /// Specifies the methods that the generated BLoC code will call when requiring a service.
 /// [init] is called when the service is started and [dispose] is called when the BLoC is disposed.
 abstract class InputService<T> {
@@ -6,8 +9,20 @@ abstract class InputService<T> {
 }
 
 /// Specifies the methods that the generated BLoC code will call when requiring a service.
-/// [init] is called when the service is started and [dispose] is called when the BLoC is disposed.
+/// [init] is called when the service is started, [listen] is called when the stream is updated and
+/// [dispose] is called when the BLoC is disposed.
 abstract class OutputService<T> {
-  void init(Stream<T> stream);
-  void dispose();
+  StreamSubscription<T> _subscription;
+
+  @mustCallSuper
+  void init(Stream<T> stream) {
+    _subscription = stream.listen(listen);
+  }
+
+  void listen(T inputData);
+
+  @mustCallSuper
+  void dispose() {
+    _subscription?.cancel();
+  }
 }

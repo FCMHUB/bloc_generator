@@ -1,3 +1,8 @@
+## 0.1.7
+
+* OutputService automatic listener
+* OutputService automatic subscription disposer
+
 ## 0.1.6
 
 * Remove current data from mappers

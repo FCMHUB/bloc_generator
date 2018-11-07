@@ -13,17 +13,8 @@ class SetService extends InputService<int> {
 }
 
 class PrintService extends OutputService<String> {
-	StreamSubscription<String> subscription;
-
 	@override
-	void init(Stream<String> stream) async {
-		subscription = stream.listen((String inputData) {
-			print("Counter set to: $inputData");
-		});
-	}
-
-	@override
-	void dispose() {
-		subscription?.cancel();
+	void listen(String inputData) {
+		print("Counter set to: $inputData");
 	}
 }
