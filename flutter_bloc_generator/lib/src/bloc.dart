@@ -116,11 +116,10 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
             .forEach((ElementAnnotation metadata) {
           List<String> inputs = findInputs(metadata);
           String name = findName(element);
-          String value = currentValues[inputs[1]];
 
           mappers += """
 								_${inputs[0]}.stream.listen((inputData) {
-									_${inputs[1]}.sink.add(template.$name(inputData, $value));
+									_${inputs[1]}.sink.add(template.$name(inputData));
 								});
 							""";
         });

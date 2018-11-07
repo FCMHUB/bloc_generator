@@ -1,3 +1,7 @@
+## 0.1.6
+
+* Remove current data from mappers
+
 ## 0.1.5
 
 * Updated service documentation
