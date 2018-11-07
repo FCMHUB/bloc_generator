@@ -21,9 +21,9 @@ class _Test {
 	String currentCounter;
 
 	@BLoCMapper("setCounter", "counter")
-	String setCounterBLoC(int intputData, String currentData) => intputData.toString();
+	Future<String> setCounterBLoC(int intputData) async => intputData.toString();
 
 	@BLoCMapper("addToCounter", "counter")
-	String setAddToCounterBLoC(int inputData, String currentData) =>
-		(int.parse(currentData) + inputData).toString();
+	Future<String> setAddToCounterBLoC(int inputData) async =>
+		(int.parse(currentCounter) + inputData).toString();
 }

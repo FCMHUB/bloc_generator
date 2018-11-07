@@ -65,7 +65,7 @@ class _Test {
   int counterValue;
 
   @BLoCMapper("setCounter", "counter")
-  int setCounterToCounter(int inputData, int currentData) => inputData;
+  Future<int> setCounterToCounter(int inputData) async => inputData;
 }
 ```
 

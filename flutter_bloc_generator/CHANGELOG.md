@@ -1,3 +1,7 @@
+## 0.2.0
+
+* Make mappers async
+
 ## 0.1.9
 
 * Make template value the only current value stored
