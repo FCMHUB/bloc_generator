@@ -8,7 +8,7 @@ import "service.dart";
 part "main.bloc.dart";
 
 @BLoC()
-@BLoCService("TestService", "setCounter")
+@BLoCRequireInputService("TestService", "setCounter")
 class _Test {
   @BLoCInput()
   StreamController<int> setCounter = StreamController<int>();

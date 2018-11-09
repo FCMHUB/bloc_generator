@@ -1,16 +1,16 @@
 import "dart:async";
 import "package:meta/meta.dart";
 
-/// Specifies the methods that the generated BLoC code will call when requiring a service.
-/// [init] is called when the service is started and [dispose] is called when the BLoC is disposed.
+/// A service that adds items to a input on a BLoC. [init] is called when the BLoC starts the
+/// service and [dispose] when the BLoC closes the service.
 abstract class InputService<T> {
   void init(Sink<T> sink);
   void dispose();
 }
 
-/// Specifies the methods that the generated BLoC code will call when requiring a service.
-/// [init] is called when the service is started, [listen] is called when the stream is updated and
-/// [dispose] is called when the BLoC is disposed.
+/// A service that takes an output from a BLoC. Automatically calles [listen] when the stream from
+/// the BLoC is updated. Optionally [init] is called when the BLoC starts the service and [dispose]
+/// when the BLoC closes the service.
 abstract class OutputService<T> {
   StreamSubscription<T> _subscription;
 
@@ -25,4 +25,11 @@ abstract class OutputService<T> {
   void dispose() {
     _subscription?.cancel();
   }
+}
+
+/// A service that taken in an entire BLoC. Useful if you want access to multiple inputs and outputs
+/// on the BLoC in one service. Also useful for passing variables to services.
+abstract class BLoCService<T> {
+  void init(T bloc);
+  void dispose();
 }

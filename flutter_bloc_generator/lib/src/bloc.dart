@@ -22,16 +22,24 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
     final Map<String, Map<String, String>> servicesList =
         <String, Map<String, String>>{};
-    if (findMetadata(element, "@BLoCService")) {
-      getMetadata(element, "@BLoCService")
-          .forEach((ElementAnnotation metadata) {
-        List<String> inputs = findInputs(metadata);
-        servicesList[inputs[0]] = {
-          "name": "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
-          "input": inputs[1]
-        };
-      });
+
+    List<ElementAnnotation> allServices = <ElementAnnotation>[];
+    if (findMetadata(element, "@BLoCRequireInputService")) {
+      allServices.addAll(getMetadata(element, "@BLoCRequireInputService"));
     }
+    if (findMetadata(element, "@BLoCRequireOutputService")) {
+      allServices.addAll(getMetadata(element, "@BLoCRequireOutputService"));
+    }
+    if (findMetadata(element, "@BLoCRequireBLoCService")) {
+      allServices.addAll(getMetadata(element, "@BLoCRequireBLoCService"));
+    }
+    allServices.forEach((ElementAnnotation metadata) {
+      List<String> inputs = findInputs(metadata);
+      servicesList[inputs[0]] = {
+        "name": "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
+        "input": inputs.length > 1 ? inputs[1] : "this"
+      };
+    });
 
     String services = "";
     String servicesInit = "";
@@ -185,29 +193,29 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       yield """
 				class $disposer extends StatefulWidget {
 					final Widget child;
+					final $bloc bloc;
 
 					$disposer({
-						@required this.child
-					});
+						@required this.child,
+						bloc
+					}) : this.bloc = bloc ?? $bloc();
 
 					@override
 					$disposerState createState() => $disposerState();
 				}
 
 				class $disposerState extends State<$disposer> {
-					$bloc bloc = $bloc();
-
 					@override
 					void dispose() {
 						super.dispose();
-						bloc?.dispose();
+						widget.bloc.dispose();
 					}
 
 					@override
 					Widget build(BuildContext context) {
 						return $provider(
 							child: widget.child,
-							bloc: bloc
+							bloc: widget.bloc
 						);
 					}
 				}

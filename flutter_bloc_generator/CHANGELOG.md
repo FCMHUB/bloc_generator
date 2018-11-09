@@ -1,3 +1,8 @@
+## 0.2.1
+
+* Make requiring a service require the service type
+* Add BLoCService service that takes an entire BLoC instead of a Stream or Sink
+
 ## 0.2.0
 
 * Make mappers async

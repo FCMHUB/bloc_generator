@@ -6,8 +6,9 @@ import "package:flutter_bloc_example/services.dart";
 part "bloc.bloc.dart";
 
 @BLoC()
-@BLoCService("SetService", "setCounter")
-@BLoCService("PrintService", "counter")
+@BLoCRequireInputService("SetService", "setCounter")
+@BLoCRequireOutputService("PrintService", "counter")
+@BLoCRequireBLoCService("MaxService")
 class _Test {
 	@BLoCInput()
 	StreamController<int> setCounter = StreamController<int>();

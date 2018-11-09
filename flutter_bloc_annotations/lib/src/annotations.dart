@@ -44,13 +44,32 @@ class BLoCMapper {
         assert(outputName != null);
 }
 
-/// Specifies a service to be used by the BLoC with name [serviceName] and will conntext to the
-/// Stream or Sink of the [controllerName] based on if it is an input or output service
-class BLoCService {
+/// Specifies a service to be used by the BLoC with name [serviceName] and will contect to the
+/// Sink of the [controllerName].
+class BLoCRequireInputService {
   final String serviceName;
   final String controllerName;
 
-  const BLoCService(this.serviceName, this.controllerName)
+  const BLoCRequireInputService(this.serviceName, this.controllerName)
       : assert(serviceName != null),
         assert(controllerName != null);
+}
+
+/// Specifies a service to be used by the BLoC with name [serviceName] and will contect to the
+/// Stream of the [controllerName].
+class BLoCRequireOutputService {
+  final String serviceName;
+  final String controllerName;
+
+  const BLoCRequireOutputService(this.serviceName, this.controllerName)
+      : assert(serviceName != null),
+        assert(controllerName != null);
+}
+
+/// Specifies a service to be used by the BLoC with name [serviceName] and will be provided with the
+/// entire BLoC
+class BLoCRequireBLoCService {
+  final String serviceName;
+
+  const BLoCRequireBLoCService(this.serviceName) : assert(serviceName != null);
 }
