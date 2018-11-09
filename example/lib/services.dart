@@ -26,9 +26,9 @@ class MaxService extends BLoCService<TestBLoC> {
 	@override
 	void init(TestBLoC bloc) {
 		_counterSub = bloc.counter.listen((String counter) {
-			if(int.parse(counter) >= 20) {
+			if(int.parse(counter) >= bloc.maxValue) {
 				print(
-					"Looks like you hit 20!\n"
+					"Looks like you hit ${bloc.maxValue}\n"
 					"Resetting..."
 				);
 				bloc.setCounter.add(0);

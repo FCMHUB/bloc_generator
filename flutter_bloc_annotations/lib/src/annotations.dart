@@ -33,6 +33,12 @@ class BLoCValue {
   const BLoCValue(this.outputName) : assert(outputName != null);
 }
 
+/// A paramater that will need to be added to the BLoC class and provided to the provider or
+/// disposer.
+class BLoCParamater {
+  const BLoCParamater();
+}
+
 /// Specifies a BLoC class member that will be called when data is added to the [inputName] stream.
 /// The return value will be added to the [outputName] stream.
 class BLoCMapper {

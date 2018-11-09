@@ -1,3 +1,7 @@
+## 0.2.2
+
+* Added paramaters that can be passed to the BLoC and are accessible to BLoC services
+
 ## 0.2.1
 
 * Make requiring a service require the service type

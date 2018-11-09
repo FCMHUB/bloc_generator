@@ -10,6 +10,9 @@ part "bloc.bloc.dart";
 @BLoCRequireOutputService("PrintService", "counter")
 @BLoCRequireBLoCService("MaxService")
 class _Test {
+	@BLoCParamater()
+	int maxValue;
+
 	@BLoCInput()
 	StreamController<int> setCounter = StreamController<int>();
 	@BLoCInput()

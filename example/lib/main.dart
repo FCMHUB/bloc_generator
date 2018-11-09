@@ -12,7 +12,8 @@ class MyApp extends StatelessWidget {
 				primarySwatch: Colors.blue,
 			),
 			home: TestDisposer(
-				child: MyHomePage(title: "Flutter Demo Home Page")
+				child: MyHomePage(title: "Flutter Demo Home Page"),
+				maxValue: 20
 			)
 		);
 	}

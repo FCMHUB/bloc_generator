@@ -63,6 +63,13 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
     String mappers = "";
 
+    String paramaters = "";
+    String paramatersList = "";
+    String paramatersInit = "";
+    String paramatersPasser = "";
+    List<String> paramatersAssert = <String>[];
+    String paramatersInput = "";
+
     Map<String, String> currentValues = <String, String>{};
 
     element.visitChildren(ClassFinder(field: (Element element) {
@@ -72,20 +79,14 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       bool isInput = findMetadata(element, "@BLoCInput");
       bool isOutput = findMetadata(element, "@BLoCOutput");
       bool isValue = findMetadata(element, "@BLoCValue");
+      bool isParamater = findMetadata(element, "@BLoCParamater");
 
       String templateType;
       if (isInput || isOutput) {
         templateType = findTemplateType(element);
       }
 
-      String name;
-      if (isInput) {
-        name = inputName[0] == "_" ? inputName.substring(1) : inputName;
-      } else if (isOutput) {
-        name = inputName[0] == "_" ? inputName.substring(1) : inputName;
-      } else if (isValue) {
-        name = inputName[0] == "_" ? inputName.substring(1) : inputName;
-      }
+      String name = inputName[0] == "_" ? inputName.substring(1) : inputName;
 
       if (isInput || isOutput) {
         controllers += "$inputType _$inputName;\n";
@@ -103,6 +104,17 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 								});
 							""";
         });
+      } else if (isParamater) {
+        final String setName =
+            "set${name[0].toUpperCase()}${name.substring(1)}";
+        paramaters += """
+							$inputType get $name => template.$name;
+							set $setName($inputType value) => template.$name = value;
+						""";
+        paramatersList += "@required $inputType $name,\n";
+        paramatersInit += "this.$setName = $name;\n";
+        paramatersPasser += "$name: $name,\n";
+        paramatersAssert.add("$name != null");
       }
 
       if (isInput) {
@@ -133,6 +145,9 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       }
     }));
 
+    final String paramatersAssertString =
+        "assert(${paramatersAssert?.join(" && ")})";
+
     yield """
 			class $bloc {
 				${element.name} template = ${element.name}();
@@ -143,7 +158,15 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
 				$values
 
-				$bloc() {
+				$paramaters
+
+				$bloc${paramatersList == "" ? "()" : """
+				({
+					$paramatersList
+				}) : $paramatersAssertString
+				"""} {
+					$paramatersInit
+
 					$controllersInit
 
 					$valueUpdaters
@@ -194,11 +217,13 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 				class $disposer extends StatefulWidget {
 					final Widget child;
 					final $bloc bloc;
+					$paramatersInput
 
 					$disposer({
 						@required this.child,
-						bloc
-					}) : this.bloc = bloc ?? $bloc();
+						bloc,
+						${paramatersList != "" ? paramatersList : ""}
+					}) : this.bloc = bloc ?? $bloc($paramatersPasser);
 
 					@override
 					$disposerState createState() => $disposerState();

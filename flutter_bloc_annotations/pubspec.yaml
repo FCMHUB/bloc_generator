@@ -1,7 +1,7 @@
 name: flutter_bloc_annotations
 description: Annotations for the flutter_bloc_generator package that will generate BLoC architected
              code automatically.
-version: 0.2.1
+version: 0.2.2
 author: Callum Iddon <iddoncallum@gmail.com>
 homepage: https://github.com/CallumIddon/flutter_bloc_generator/
 
