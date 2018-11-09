@@ -138,7 +138,10 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
           mappers += """
 								_${inputs[0]}.stream.listen((inputData) async {
-									_${inputs[1]}.sink.add(await template.$name(inputData));
+									final newData = await template.$name(inputData);
+									if(newData != null) {
+										_${inputs[1]}.sink.add(newData);
+									}
 								});
 							""";
         });

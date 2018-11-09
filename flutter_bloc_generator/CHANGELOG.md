@@ -1,3 +1,7 @@
+## 0.2.3
+
+* Allow mappers to return null to not add anything to the output
+
 ## 0.2.2
 
 * Added paramaters that can be passed to the BLoC and are accessible to BLoC services
