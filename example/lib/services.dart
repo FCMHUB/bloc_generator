@@ -81,13 +81,16 @@ class TriggeredService extends TriggerService<TestBLoC> {
 			"                                                                       \n"
 		);
 		print(
-			"There are 3 types of services; input, output and BLoC.                 \n"
+			"There are 4 types of services; input, output, BLoC and trigger.        \n"
 			"Input and output take in a Stream or Sink, respective of their         \n"
 			"type, from the BLoC. They can then use it to modify the BLoC           \n"
 			"or receive updates from the BLoC.                                      \n"
 			"                                                                       \n"
 			"BLoC services take in the entire BLoC and have access to               \n"
 			"everything on the BLoC.                                                \n"
+			"                                                                       \n"
+			"Trigger services have access to the entire BLoC but must be triggerd by\n"
+			"other code that has access to the BLoC.                                \n"
 			"                                                                       \n"
 		);
 	}
