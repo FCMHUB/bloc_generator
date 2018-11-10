@@ -33,3 +33,10 @@ abstract class BLoCService<T> {
   void init(T bloc);
   void dispose();
 }
+
+/// A service that can be triggered by anything with access to the BLoC. Takes in the entire bloc
+/// when triggered. Useful for validating and submitting forms.
+abstract class TriggerService<T> {
+  Future<void> trigger(T bloc);
+  void dispose();
+}

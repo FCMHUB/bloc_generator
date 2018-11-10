@@ -9,6 +9,17 @@ import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 import "package:flutter_bloc_generator/src/classFinder.dart";
 import "package:flutter_bloc_generator/src/metadata.dart";
 
+enum ServiceMetadataType { input, output, bloc, trigger }
+
+class ServiceMetadata {
+  final ServiceMetadataType type;
+  final List<ElementAnnotation> metadata;
+
+  ServiceMetadata(this.type, this.metadata)
+      : assert(type != null),
+        assert(metadata != null);
+}
+
 class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
   BuilderOptions options;
   BLoCGenerator(this.options);
@@ -20,37 +31,59 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
         element.name[0] == "_" ? element.name.substring(1) : element.name;
     final String bloc = "${name}BLoC";
 
-    final Map<String, Map<String, String>> servicesList =
-        <String, Map<String, String>>{};
+    final Map<String, Map<String, dynamic>> servicesList =
+        <String, Map<String, dynamic>>{};
 
-    List<ElementAnnotation> allServices = <ElementAnnotation>[];
+    List<ServiceMetadata> allServices = <ServiceMetadata>[];
     if (findMetadata(element, "@BLoCRequireInputService")) {
-      allServices.addAll(getMetadata(element, "@BLoCRequireInputService"));
+      allServices.add(ServiceMetadata(ServiceMetadataType.input,
+          getMetadata(element, "@BLoCRequireInputService")));
     }
     if (findMetadata(element, "@BLoCRequireOutputService")) {
-      allServices.addAll(getMetadata(element, "@BLoCRequireOutputService"));
+      allServices.add(ServiceMetadata(ServiceMetadataType.output,
+          getMetadata(element, "@BLoCRequireOutputService")));
     }
     if (findMetadata(element, "@BLoCRequireBLoCService")) {
-      allServices.addAll(getMetadata(element, "@BLoCRequireBLoCService"));
+      allServices.add(ServiceMetadata(ServiceMetadataType.bloc,
+          getMetadata(element, "@BLoCRequireBLoCService")));
     }
-    allServices.forEach((ElementAnnotation metadata) {
-      List<String> inputs = findInputs(metadata);
-      servicesList[inputs[0]] = {
-        "name": "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
-        "input": inputs.length > 1 ? inputs[1] : "this"
-      };
+    if (findMetadata(element, "@BLoCRequireTriggerService")) {
+      allServices.add(ServiceMetadata(ServiceMetadataType.trigger,
+          getMetadata(element, "@BLoCRequireTriggerService")));
+    }
+    allServices.forEach((ServiceMetadata service) {
+      service.metadata.forEach((ElementAnnotation metadata) {
+        List<String> inputs = findInputs(metadata);
+        servicesList[inputs[0]] = {
+          "name": "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
+          "input": service.type == ServiceMetadataType.bloc ||
+                  service.type == ServiceMetadataType.trigger
+              ? "this"
+              : inputs[1],
+          "type": service.type
+        };
+      });
     });
 
     String services = "";
     String servicesInit = "";
+    String servicesTrigger = "";
     String servicesDispose = "";
 
     servicesList.keys.forEach((String service) {
-      final String serviceName = servicesList[service]["name"];
-      final String inputName = servicesList[service]["input"];
+      final Map<String, dynamic> serviceData = servicesList[service];
+      final String serviceName = serviceData["name"];
+      final String inputName = serviceData["input"];
 
       services += "$service $serviceName = $service();\n";
-      servicesInit += "$serviceName.init($inputName);\n";
+      if (serviceData["type"] != ServiceMetadataType.trigger) {
+        servicesInit += "$serviceName.init($inputName);\n";
+      } else {
+        final String triggerName = "trigger${serviceName[0].toUpperCase()}"
+            "${serviceName.substring(1)}";
+        servicesTrigger +=
+            "void $triggerName() async => await $serviceName.trigger(this);\n";
+      }
       servicesDispose += "$serviceName.dispose();\n";
     });
 
@@ -162,6 +195,8 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 				$values
 
 				$paramaters
+
+				$servicesTrigger
 
 				$bloc${paramatersList == "" ? "()" : """
 				({

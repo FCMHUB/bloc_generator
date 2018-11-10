@@ -79,3 +79,12 @@ class BLoCRequireBLoCService {
 
   const BLoCRequireBLoCService(this.serviceName) : assert(serviceName != null);
 }
+
+/// Specified a service to be used by the BLoC with [serviceName] and will be available on the BLoC
+/// to be called from anywhere.
+class BLoCRequireTriggerService {
+  final String serviceName;
+
+  const BLoCRequireTriggerService(this.serviceName)
+      : assert(serviceName != null);
+}

@@ -9,6 +9,7 @@ part "bloc.bloc.dart";
 @BLoCRequireInputService("SetService", "setCounter")
 @BLoCRequireOutputService("PrintService", "counter")
 @BLoCRequireBLoCService("MaxService")
+@BLoCRequireTriggerService("TriggeredService")
 class _Test {
 	@BLoCParamater()
 	int maxValue;

@@ -1,3 +1,7 @@
+## 0.2.4
+
+* Add TriggeredService
+
 ## 0.2.3
 
 * Allow mappers to return null to not add anything to the output
