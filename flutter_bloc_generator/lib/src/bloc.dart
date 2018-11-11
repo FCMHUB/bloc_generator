@@ -82,7 +82,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
         final String triggerName = "trigger${serviceName[0].toUpperCase()}"
             "${serviceName.substring(1)}";
         servicesTrigger +=
-            "void $triggerName() async => await $serviceName.trigger(this);\n";
+            "Future<void> $triggerName() async => await $serviceName.trigger(this);\n";
       }
       servicesDispose += "$serviceName.dispose();\n";
     });
@@ -168,15 +168,16 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
             .forEach((ElementAnnotation metadata) {
           List<String> inputs = findInputs(metadata);
           String name = findName(element);
+          bool future = findType(element).startsWith("Future");
 
           mappers += """
-								_${inputs[0]}.stream.listen((inputData) async {
-									final newData = await template.$name(inputData);
-									if(newData != null) {
-										_${inputs[1]}.sink.add(newData);
-									}
-								});
-							""";
+						_${inputs[0]}.stream.listen((inputData) ${future ? "async" : ""} {
+							final newData = ${future ? "await" : ""} template.$name(inputData);
+							if(newData != null) {
+								_${inputs[1]}.sink.add(newData);
+							}
+						});
+					""";
         });
       }
     }));

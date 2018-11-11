@@ -1,3 +1,8 @@
+## 0.2.5
+
+* Currect trigger types to Future\<void\> from void
+* Make mappers optionally async
+
 ## 0.2.4
 
 * Add TriggeredService
