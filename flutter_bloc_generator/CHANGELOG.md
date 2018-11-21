@@ -1,3 +1,7 @@
+## 0.2.6
+
+* Add MapperService, AsyncMapperService, RequireMapperService and RequireAsyncMapperService
+
 ## 0.2.5
 
 * Currect trigger types to Future\<void\> from void

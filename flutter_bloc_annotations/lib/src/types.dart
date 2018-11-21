@@ -5,7 +5,7 @@ import "package:meta/meta.dart";
 /// service and [dispose] when the BLoC closes the service.
 abstract class InputService<T> {
   void init(Sink<T> sink);
-  void dispose();
+  void dispose() {}
 }
 
 /// A service that takes an output from a BLoC. Automatically calles [listen] when the stream from
@@ -13,6 +13,7 @@ abstract class InputService<T> {
 /// when the BLoC closes the service.
 abstract class OutputService<T> {
   StreamSubscription<T> _subscription;
+  StreamSubscription<T> get subscription => _subscription;
 
   @mustCallSuper
   void init(Stream<T> stream) {
@@ -31,12 +32,24 @@ abstract class OutputService<T> {
 /// on the BLoC in one service. Also useful for passing variables to services.
 abstract class BLoCService<T> {
   void init(T bloc);
-  void dispose();
+  void dispose() {}
 }
 
 /// A service that can be triggered by anything with access to the BLoC. Takes in the entire bloc
 /// when triggered. Useful for validating and submitting forms.
 abstract class TriggerService<T> {
   Future<void> trigger(T bloc);
-  void dispose();
+  void dispose() {}
+}
+
+/// A service that acts as a BLoCMapper that can be reused between BLoCs.
+abstract class MapperService<INPUTTYPE, OUTPUTTYPE> {
+  OUTPUTTYPE map(INPUTTYPE inputData);
+  void dispose() {}
+}
+
+/// A MapperrService that is asynchronous.
+abstract class AsyncMapperService<INPUTTYPE, OUTPUTTYPE> {
+  Future<OUTPUTTYPE> map(INPUTTYPE inputData);
+  void dispose() {}
 }

@@ -8,9 +8,6 @@ class SetService extends InputService<int> {
 		await Future.delayed(Duration(seconds: 10));
 		sink.add(10);
 	}
-
-	@override
-	void dispose() {}
 }
 
 class PrintService extends OutputService<String> {
@@ -39,6 +36,7 @@ class MaxService extends BLoCService<TestBLoC> {
 	@override
 	void dispose() {
 		_counterSub.cancel();
+		print("DISPOSE");
 	}
 }
 
@@ -94,7 +92,8 @@ class TriggeredService extends TriggerService<TestBLoC> {
 			"                                                                       \n"
 		);
 	}
+}
 
-	@override
-	void dispose() {}
+class StringifyMapper extends MapperService<int, String> {
+	String map(int inputData) => inputData.toString();
 }

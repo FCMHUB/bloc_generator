@@ -10,6 +10,7 @@ part "bloc.bloc.dart";
 @BLoCRequireOutputService("PrintService", "counter")
 @BLoCRequireBLoCService("MaxService")
 @BLoCRequireTriggerService("TriggeredService")
+@BLoCRequireMapperService("StringifyMapper", "setCounter", "counter")
 class _Test {
 	@BLoCParamater()
 	int maxValue;
@@ -24,9 +25,6 @@ class _Test {
 
 	@BLoCValue("counter")
 	String currentCounter;
-
-	@BLoCMapper("setCounter", "counter")
-	String setCounterBLoC(int intputData) => intputData.toString();
 
 	@BLoCMapper("addToCounter", "counter")
 	String setAddToCounterBLoC(int inputData) => (int.parse(currentCounter) + inputData).toString();

@@ -50,6 +50,35 @@ class BLoCMapper {
         assert(outputName != null);
 }
 
+/// Specifies a MapperService class that will be called when data is added to the [inputName]
+/// stream. The return value will be added to the [outputName] stream. Make sure [mapperName] is
+/// imported in the main file so the bloc can access it.
+class BLoCRequireMapperService {
+  final String mapperName;
+  final String inputName;
+  final String outputName;
+
+  const BLoCRequireMapperService(
+      this.mapperName, this.inputName, this.outputName)
+      : assert(mapperName != null),
+        assert(inputName != null),
+        assert(outputName != null);
+}
+
+/// Same as BLoCRequireMapperService but will call the mapper asyncronously. [mapperName] must be
+/// an AsyncMapperService.
+class BLoCRequireAsyncMapperService {
+  final String mapperName;
+  final String inputName;
+  final String outputName;
+
+  const BLoCRequireAsyncMapperService(
+      this.mapperName, this.inputName, this.outputName)
+      : assert(mapperName != null),
+        assert(inputName != null),
+        assert(outputName != null);
+}
+
 /// Specifies a service to be used by the BLoC with name [serviceName] and will contect to the
 /// Sink of the [controllerName].
 class BLoCRequireInputService {

@@ -9,7 +9,7 @@ import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 import "package:flutter_bloc_generator/src/classFinder.dart";
 import "package:flutter_bloc_generator/src/metadata.dart";
 
-enum ServiceMetadataType { input, output, bloc, trigger }
+enum ServiceMetadataType { input, output, bloc, trigger, mapper, asyncMapper }
 
 class ServiceMetadata {
   final ServiceMetadataType type;
@@ -31,9 +31,6 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
         element.name[0] == "_" ? element.name.substring(1) : element.name;
     final String bloc = "${name}BLoC";
 
-    final Map<String, Map<String, dynamic>> servicesList =
-        <String, Map<String, dynamic>>{};
-
     List<ServiceMetadata> allServices = <ServiceMetadata>[];
     if (findMetadata(element, "@BLoCRequireInputService")) {
       allServices.add(ServiceMetadata(ServiceMetadataType.input,
@@ -51,40 +48,58 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       allServices.add(ServiceMetadata(ServiceMetadataType.trigger,
           getMetadata(element, "@BLoCRequireTriggerService")));
     }
-    allServices.forEach((ServiceMetadata service) {
-      service.metadata.forEach((ElementAnnotation metadata) {
-        List<String> inputs = findInputs(metadata);
-        servicesList[inputs[0]] = {
-          "name": "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}",
-          "input": service.type == ServiceMetadataType.bloc ||
-                  service.type == ServiceMetadataType.trigger
-              ? "this"
-              : inputs[1],
-          "type": service.type
-        };
-      });
-    });
+    if (findMetadata(element, "@BLoCRequireMapperService")) {
+      allServices.add(ServiceMetadata(ServiceMetadataType.mapper,
+          getMetadata(element, "@BLoCRequireMapperService")));
+    }
+    if (findMetadata(element, "@BLoCRequireAsyncMapperService")) {
+      allServices.add(ServiceMetadata(ServiceMetadataType.asyncMapper,
+          getMetadata(element, "@BLoCRequireAsyncMapperService")));
+    }
 
     String services = "";
     String servicesInit = "";
     String servicesTrigger = "";
     String servicesDispose = "";
 
-    servicesList.keys.forEach((String service) {
-      final Map<String, dynamic> serviceData = servicesList[service];
-      final String serviceName = serviceData["name"];
-      final String inputName = serviceData["input"];
+    String mappers = "";
 
-      services += "$service $serviceName = $service();\n";
-      if (serviceData["type"] != ServiceMetadataType.trigger) {
-        servicesInit += "$serviceName.init($inputName);\n";
-      } else {
-        final String triggerName = "trigger${serviceName[0].toUpperCase()}"
-            "${serviceName.substring(1)}";
-        servicesTrigger +=
-            "Future<void> $triggerName() async => await $serviceName.trigger(this);\n";
-      }
-      servicesDispose += "$serviceName.dispose();\n";
+    allServices.forEach((ServiceMetadata service) {
+      service.metadata.forEach((ElementAnnotation metadata) {
+        List<String> inputs = findInputs(metadata);
+        String serviceType = inputs[0];
+        String serviceName =
+            "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}";
+        String inputName = service.type == ServiceMetadataType.bloc ||
+                service.type == ServiceMetadataType.trigger
+            ? "this"
+            : inputs[1];
+
+        services += "$serviceType $serviceName = $serviceType();\n";
+
+        if (service.type != ServiceMetadataType.trigger &&
+            service.type != ServiceMetadataType.mapper &&
+            service.type != ServiceMetadataType.asyncMapper) {
+          servicesInit += "$serviceName.init($inputName);\n";
+        } else if (service.type == ServiceMetadataType.mapper ||
+            service.type == ServiceMetadataType.asyncMapper) {
+          bool future = service.type == ServiceMetadataType.asyncMapper;
+          mappers += """
+				_${inputs[1]}.stream.listen((inputData) ${future ? "async" : ""} {
+					final newData = ${future ? "await" : ""} $serviceName.map(inputData);
+					if(newData != null) {
+						_${inputs[2]}.sink.add(newData);
+					}
+				});
+			""";
+        } else if (service.type == ServiceMetadataType.trigger) {
+          final String triggerName = "trigger${serviceName[0].toUpperCase()}"
+              "${serviceName.substring(1)}";
+          servicesTrigger +=
+              "Future<void> $triggerName() async => await $serviceName.trigger(this);\n";
+        }
+        servicesDispose += "$serviceName.dispose();\n";
+      });
     });
 
     String controllers = "";
@@ -93,8 +108,6 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
     String values = "";
     String valueUpdaters = "";
-
-    String mappers = "";
 
     String paramaters = "";
     String paramatersList = "";
