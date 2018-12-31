@@ -1,9 +1,6 @@
 # flutter_bloc_annotations
 
-## Usage
-
-To import the annotations and `Service` abstract class add `flutter_bloc_annotations` to your
-`pubspec.yaml`.
+## Installation
 
 ```yaml
 dependencies:
@@ -12,9 +9,9 @@ dependencies:
 
 ## Import Requirements
 
-`flutter_bloc_annotations` uses `InheritedWidget`, `StatefulWidget`, `State`, `Widget` and
-`BuildContext` from `package:flutter/material.dart`. This needs to be imported as the generated
-`part` file cannot have import statements. Any `services` that are used also need to be imported.
+`flutter_bloc_annotations` uses the `@required` annotation from `package:flutter/material.dart`.
+This needs to be imported as the generated `part` file cannot have import statements. Any `services`
+that are used also need to be imported.
 
 ## Class Member Requirements
 
@@ -29,61 +26,20 @@ Using `StreamController` isn't required so `rxdart`s `subject`s such as `Behavio
 can be used as shown in the
 [example](https://github.com/CallumIddon/flutter_bloc_generator/tree/master/example/lib/bloc.dart).
 
-## Output Classes
+## Output Class
 
-The output classes can be seen in the generated `.bloc.dart` file. Generally a `BLoC`, `Provider`
-and `Disposer` are created. The `BLoC` class defines the inputs and outputs of the bloc and calls
-your `@BLoCMappers` when somthing is added to the input streams and adds the output to the output
-streams. The `BLoC` class will also create, initialize and dispose of any services you require.
+The output class can be seen in the generated `.bloc.dart` file. The `BLoC` class defines the inputs
+and outputs of the bloc and calls your `@BLoCMappers` when somthing is added to the input streams
+and adds the output to the output streams. The `BLoC` class will also create, initialize and dispose
+of any services you require.
 
 ## Services
 
-Services are automatic inputs to a `BLoC` that are initialized when the bloc is created. This makes
-it easier to make database connections that automatically add to the `BLoC` while still being
-testable without creating a an entire `BLoC` to add to as they only require a `Sink` to add to.
+Services are automated parts of a `BLoC`. They can be inputs, outputs, consume the entire `BLoC`,
+be a mapper or be triggered manually. You can find all the available services
+[here](lib/src/types.dart).
 
-## Examples
+## Example
 
-```dart
-// main.dart
-import "dart:async";
-import "package:flutter/material.dart";
-import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
-import "service.dart";
-part "main.bloc.dart";
-
-@BLoC()
-@BLoCService("TestService", "setCounter")
-class _Test {
-  @BLoCInput()
-  StreamController<int> setCounter = StreamController<int>();
-
-  @BLoCOutput()
-  StreamController<int> counter = StreamController<int>();
-
-  @BLoCValue("counter")
-  int counterValue;
-
-  @BLoCMapper("setCounter", "counter")
-  Future<int> setCounterToCounter(int inputData) async => inputData;
-}
-```
-
-```dart
-// service.dart
-import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
-
-class TestService extends InputService<int> {
-  @override
-  void init(Sink<int> sink) async {
-    await Future.delayed(Duration(seconds: 10));
-    sink.add(10);
-  }
-
-  @override
-  void dispose() {}
-}
-```
-
-More extensive examples can be found in the root
+An extensive example can be found in the root
 [example/](https://github.com/CallumIddon/flutter_bloc_generator/tree/master/example) directory.

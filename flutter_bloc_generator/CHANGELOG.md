@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Removed AsyncMapperService
+* Made all mappers streams
+* Split out providers and disposer to flutter_bloc_provider package
+
 ## 0.2.6
 
 * Add MapperService, AsyncMapperService, RequireMapperService and RequireAsyncMapperService

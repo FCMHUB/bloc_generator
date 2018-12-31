@@ -1,9 +1,6 @@
 # flutter_bloc_generator
 
-## Usage
-
-Add `flutter_bloc_generator` and `build_runner` as `dev_dependencies` to make the `build_runner` cli
-and `BLoCGenerator` available for generation.
+## Installation
 
 ```yaml
 dev_dependencies:
@@ -29,5 +26,5 @@ or to watch for changes:
 
 ## Example
 
-A more extensive example can be found in the root
+An extensive example can be found in the root
 [example/](https://github.com/CallumIddon/flutter_bloc_generator/tree/master/example) directory.

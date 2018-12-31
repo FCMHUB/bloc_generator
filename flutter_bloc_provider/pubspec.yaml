@@ -1,0 +1,14 @@
+name: flutter_bloc_provider
+description: Provider and disposer widgets for flutter_bloc_annotations.
+version: 0.3.0
+author: Callum Iddon <iddoncallum@gmail.com>
+homepage: https://github.com/CallumIddon/flutter_bloc_generator
+
+environment:
+  sdk: ">=2.0.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_bloc_annotations: 0.3.0

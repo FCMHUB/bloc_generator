@@ -1,6 +1,8 @@
 import "package:flutter/material.dart";
 import "package:flutter_bloc_example/bloc.dart";
 
+import "package:flutter_bloc_provider/flutter_bloc_provider.dart";
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -11,9 +13,11 @@ class MyApp extends StatelessWidget {
 			theme: ThemeData(
 				primarySwatch: Colors.blue,
 			),
-			home: TestDisposer(
-				child: MyHomePage(title: "Flutter Demo Home Page"),
-				maxValue: 20
+			home: BLoCDisposer<TestBLoC>(
+				bloc: TestBLoC(
+					maxValue: 20
+				),
+				child: MyHomePage(title: "Flutter Demo Home Page")
 			)
 		);
 	}
@@ -28,7 +32,7 @@ class MyHomePage extends StatelessWidget {
 
 	@override
 	Widget build(BuildContext context) {
-		final TestBLoC bloc = TestProvider.of(context);
+		final TestBLoC bloc = BLoCProvider.of<TestBLoC>(context);
 		return Scaffold(
 			appBar: AppBar(
 				title: Text(title),
@@ -56,14 +60,12 @@ class MyHomePage extends StatelessWidget {
 											children: <Widget>[
 												MaterialButton(
 													child: Text("Reset Counter"),
-													onPressed: bloc.currentCounter != "0" ?
-																() => bloc.setCounter.add(0) :
-																null
+													onPressed: () => bloc.setCounter.add(0)
 												),
 
 												MaterialButton(
 													child: Text("Tutorial"),
-													onPressed: bloc.triggerTriggeredService
+													onPressed: bloc.triggerTutorialService
 												)
 											]
 										)

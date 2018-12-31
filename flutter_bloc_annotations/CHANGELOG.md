@@ -1,3 +1,8 @@
+## 0.3.0
+
+* Moved annotation inputs to Type from String where possible
+* Added BLoCTemplate and Service abstract classes for type safety
+
 ## 0.2.6
 
 * Add MapperService, AsyncMapperService, RequireMapperService and RequireAsyncMapperService

@@ -6,11 +6,11 @@ import "package:flutter_bloc_example/services.dart";
 part "bloc.bloc.dart";
 
 @BLoC()
-@BLoCRequireInputService("SetService", "setCounter")
-@BLoCRequireOutputService("PrintService", "counter")
-@BLoCRequireBLoCService("MaxService")
-@BLoCRequireTriggerService("TriggeredService")
-@BLoCRequireMapperService("StringifyMapper", "setCounter", "counter")
+@BLoCRequireInputService(SetService, "setCounter")
+@BLoCRequireOutputService(PrintService, "counter")
+@BLoCRequireBLoCService(MaxService)
+@BLoCRequireTriggerService(TutorialService)
+@BLoCRequireMapperService(StringifyMapper, "setCounter", "counter")
 class _Test {
 	@BLoCParamater()
 	int maxValue;
@@ -27,5 +27,7 @@ class _Test {
 	String currentCounter;
 
 	@BLoCMapper("addToCounter", "counter")
-	String setAddToCounterBLoC(int inputData) => (int.parse(currentCounter) + inputData).toString();
+	Stream<String> setAddToCounterBLoC(int inputData) async* {
+		yield (int.parse(currentCounter) + inputData).toString();
+	}
 }

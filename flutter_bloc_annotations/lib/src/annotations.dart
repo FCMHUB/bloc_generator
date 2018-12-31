@@ -8,13 +8,9 @@
 /// This widget will automatically create and disposer of a provider and bloc automatically with
 /// the lifecycle methods of the statefule widget.
 class BLoC {
-  final bool provider;
   final bool disposer;
 
-  const BLoC({this.provider = true, disposer = true})
-      : assert(provider != null),
-        assert(disposer != null),
-        this.disposer = provider ? disposer : false;
+  const BLoC({this.disposer = true}) : assert(disposer != null);
 }
 
 /// Specifies a BLoC class member is an input stream
@@ -51,69 +47,52 @@ class BLoCMapper {
 }
 
 /// Specifies a MapperService class that will be called when data is added to the [inputName]
-/// stream. The return value will be added to the [outputName] stream. Make sure [mapperName] is
+/// stream. The return value will be added to the [outputName] stream. Make sure [mapper] is
 /// imported in the main file so the bloc can access it.
 class BLoCRequireMapperService {
-  final String mapperName;
+  final Type mapper;
   final String inputName;
   final String outputName;
 
-  const BLoCRequireMapperService(
-      this.mapperName, this.inputName, this.outputName)
-      : assert(mapperName != null),
+  const BLoCRequireMapperService(this.mapper, this.inputName, this.outputName)
+      : assert(mapper != null),
         assert(inputName != null),
         assert(outputName != null);
 }
 
-/// Same as BLoCRequireMapperService but will call the mapper asyncronously. [mapperName] must be
-/// an AsyncMapperService.
-class BLoCRequireAsyncMapperService {
-  final String mapperName;
-  final String inputName;
-  final String outputName;
-
-  const BLoCRequireAsyncMapperService(
-      this.mapperName, this.inputName, this.outputName)
-      : assert(mapperName != null),
-        assert(inputName != null),
-        assert(outputName != null);
-}
-
-/// Specifies a service to be used by the BLoC with name [serviceName] and will contect to the
-/// Sink of the [controllerName].
+/// Specifies a [service] to be used by the BLoC and will contect to the Sink of the
+/// [controllerName].
 class BLoCRequireInputService {
-  final String serviceName;
+  final Type service;
   final String controllerName;
 
-  const BLoCRequireInputService(this.serviceName, this.controllerName)
-      : assert(serviceName != null),
+  const BLoCRequireInputService(this.service, this.controllerName)
+      : assert(service != null),
         assert(controllerName != null);
 }
 
-/// Specifies a service to be used by the BLoC with name [serviceName] and will contect to the
-/// Stream of the [controllerName].
+/// Specifies a [service] to be used by the BLoC and will contected to the Stream of the
+/// [controllerName].
 class BLoCRequireOutputService {
-  final String serviceName;
+  final Type service;
   final String controllerName;
 
-  const BLoCRequireOutputService(this.serviceName, this.controllerName)
-      : assert(serviceName != null),
+  const BLoCRequireOutputService(this.service, this.controllerName)
+      : assert(service != null),
         assert(controllerName != null);
 }
 
-/// Specifies a service to be used by the BLoC with name [serviceName] and will be provided with the
-/// entire BLoC
+/// Specifies a [service] to be used by the BLoC and will be provided with the entire BLoC
 class BLoCRequireBLoCService {
-  final String serviceName;
+  final Type service;
 
-  const BLoCRequireBLoCService(this.serviceName) : assert(serviceName != null);
+  const BLoCRequireBLoCService(this.service) : assert(service != null);
 }
 
-/// Specified a service to be used by the BLoC with [serviceName] and will be available on the BLoC
-/// to be called from anywhere.
+/// Specified a [service] to be used by the BLoC and will be available on the BLoC to be called by
+/// your app.
 class BLoCRequireTriggerService {
-  final String serviceName;
+  final Type service;
 
-  const BLoCRequireTriggerService(this.serviceName)
-      : assert(serviceName != null);
+  const BLoCRequireTriggerService(this.service) : assert(service != null);
 }

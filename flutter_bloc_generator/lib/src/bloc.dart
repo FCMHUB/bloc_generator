@@ -1,7 +1,6 @@
 import "dart:async";
 import "package:build/build.dart";
 import "package:analyzer/dart/element/element.dart";
-import "package:build/src/builder/build_step.dart";
 import "package:source_gen/source_gen.dart";
 
 import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
@@ -9,7 +8,7 @@ import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
 import "package:flutter_bloc_generator/src/classFinder.dart";
 import "package:flutter_bloc_generator/src/metadata.dart";
 
-enum ServiceMetadataType { input, output, bloc, trigger, mapper, asyncMapper }
+enum ServiceMetadataType { input, output, bloc, trigger, mapper }
 
 class ServiceMetadata {
   final ServiceMetadataType type;
@@ -52,10 +51,6 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       allServices.add(ServiceMetadata(ServiceMetadataType.mapper,
           getMetadata(element, "@BLoCRequireMapperService")));
     }
-    if (findMetadata(element, "@BLoCRequireAsyncMapperService")) {
-      allServices.add(ServiceMetadata(ServiceMetadataType.asyncMapper,
-          getMetadata(element, "@BLoCRequireAsyncMapperService")));
-    }
 
     String services = "";
     String servicesInit = "";
@@ -78,18 +73,14 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
         services += "$serviceType $serviceName = $serviceType();\n";
 
         if (service.type != ServiceMetadataType.trigger &&
-            service.type != ServiceMetadataType.mapper &&
-            service.type != ServiceMetadataType.asyncMapper) {
+            service.type != ServiceMetadataType.mapper) {
           servicesInit += "$serviceName.init($inputName);\n";
-        } else if (service.type == ServiceMetadataType.mapper ||
-            service.type == ServiceMetadataType.asyncMapper) {
-          bool future = service.type == ServiceMetadataType.asyncMapper;
+        } else if (service.type == ServiceMetadataType.mapper) {
           mappers += """
-				_${inputs[1]}.stream.listen((inputData) ${future ? "async" : ""} {
-					final newData = ${future ? "await" : ""} $serviceName.map(inputData);
-					if(newData != null) {
+				_${inputs[1]}.stream.listen((inputData) {
+					$serviceName.map(inputData).forEach((newData) {
 						_${inputs[2]}.sink.add(newData);
-					}
+					});
 				});
 			""";
         } else if (service.type == ServiceMetadataType.trigger) {
@@ -112,9 +103,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
     String paramaters = "";
     String paramatersList = "";
     String paramatersInit = "";
-    String paramatersPasser = "";
     List<String> paramatersAssert = <String>[];
-    String paramatersInput = "";
 
     Map<String, String> currentValues = <String, String>{};
 
@@ -151,15 +140,9 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 							""";
         });
       } else if (isParamater) {
-        final String setName =
-            "set${name[0].toUpperCase()}${name.substring(1)}";
-        paramaters += """
-							$inputType get $name => template.$name;
-							set $setName($inputType value) => template.$name = value;
-						""";
+        paramaters += "$inputType get $name => template.$name;";
         paramatersList += "@required $inputType $name,\n";
-        paramatersInit += "this.$setName = $name;\n";
-        paramatersPasser += "$name: $name,\n";
+        paramatersInit += "template.$name = $name;\n";
         paramatersAssert.add("$name != null");
       }
 
@@ -181,25 +164,20 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
             .forEach((ElementAnnotation metadata) {
           List<String> inputs = findInputs(metadata);
           String name = findName(element);
-          bool future = findType(element).startsWith("Future");
 
           mappers += """
-						_${inputs[0]}.stream.listen((inputData) ${future ? "async" : ""} {
-							final newData = ${future ? "await" : ""} template.$name(inputData);
-							if(newData != null) {
+						_${inputs[0]}.stream.listen((inputData) {
+							template.$name(inputData).forEach((newData) {
 								_${inputs[1]}.sink.add(newData);
-							}
+							});
 						});
 					""";
         });
       }
     }));
 
-    final String paramatersAssertString =
-        "assert(${paramatersAssert?.join(" && ")})";
-
     yield """
-			class $bloc {
+			class $bloc extends BLoCTemplate {
 				${element.name} template = ${element.name}();
 
 				$services
@@ -215,7 +193,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 				$bloc${paramatersList == "" ? "()" : """
 				({
 					$paramatersList
-				}) : $paramatersAssertString
+				})
 				"""} {
 					$paramatersInit
 
@@ -228,75 +206,12 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 					$servicesInit
 				}
 
+				@override
 				void dispose() {
 					$servicesDispose
 					$controllersDisposer
 				}
 			}
 		""";
-
-    final bool buildProvider = annotation.read("provider").boolValue;
-    final String provider = "${name}Provider";
-
-    if (buildProvider) {
-      yield """
-				class $provider extends InheritedWidget {
-					final Widget child;
-					final $bloc bloc;
-
-					$provider({
-						@required this.child,
-						@required this.bloc
-					}) : assert(child != null),
-						assert(bloc != null),
-						super(child: child);
-
-					static $bloc of(BuildContext context) =>
-						(context.inheritFromWidgetOfExactType($provider) as $provider).bloc;
-
-					@override
-					bool updateShouldNotify(InheritedWidget old) => old.child != child;
-				}
-			""";
-    }
-
-    final bool buildDisposer = annotation.read("disposer").boolValue;
-    final String disposer = "${name}Disposer";
-    final String disposerState = "_${disposer}State";
-
-    if (buildDisposer) {
-      yield """
-				class $disposer extends StatefulWidget {
-					final Widget child;
-					final $bloc bloc;
-					$paramatersInput
-
-					$disposer({
-						@required this.child,
-						bloc,
-						${paramatersList != "" ? paramatersList : ""}
-					}) : this.bloc = bloc ?? $bloc($paramatersPasser);
-
-					@override
-					$disposerState createState() => $disposerState();
-				}
-
-				class $disposerState extends State<$disposer> {
-					@override
-					void dispose() {
-						super.dispose();
-						widget.bloc.dispose();
-					}
-
-					@override
-					Widget build(BuildContext context) {
-						return $provider(
-							child: widget.child,
-							bloc: widget.bloc
-						);
-					}
-				}
-			""";
-    }
   }
 }

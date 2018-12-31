@@ -25,12 +25,20 @@ List<ElementAnnotation> getMetadata(Element element, String metadataName) {
 }
 
 List<String> findInputs(ElementAnnotation metadata) => metadata
-    .toSource()
-    .split("(")[1]
-    .split(")")[0]
-    .split(", ")
-    .map((String input) => input.substring(1, input.length - 1))
-    .toList();
+        .toSource()
+        .split("(")[1]
+        .split(")")[0]
+        .split(", ")
+        .map((String input) {
+      String output = input;
+      if (output.startsWith("\"")) {
+        output = output.substring(1);
+      }
+      if (output.endsWith("\"")) {
+        output = output.substring(0, output.length - 1);
+      }
+      return output;
+    }).toList();
 
 bool checkMethod(Element element) => element.toString().indexOf("(") != -1;
 
