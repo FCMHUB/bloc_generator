@@ -1,17 +1,17 @@
-# flutter_bloc_annotations
+# bloc_annotations
 
 ## Installation
 
 ```yaml
 dependencies:
-  flutter_bloc_annotations: <latest_version>
+  bloc_annotations: <latest_version>
 ```
 
 ## Import Requirements
 
-`flutter_bloc_annotations` uses the `@required` annotation from `package:flutter/material.dart`.
-This needs to be imported as the generated `part` file cannot have import statements. Any `services`
-that are used also need to be imported.
+`bloc_annotations` uses the `@required` where `BLoCParamater` is used.
+`package:flutter/material.dart` needs to be imported when this is used as the generated `part` file
+cannot have import statements. Any `services` that are used also need to be imported.
 
 ## Class Member Requirements
 
@@ -24,7 +24,7 @@ class and will have no effect on the initial data.
 
 Using `StreamController` isn't required so `rxdart`s `subject`s such as `BehaviourSubject`
 can be used as shown in the
-[example](https://github.com/CallumIddon/flutter_bloc_generator/tree/master/example/lib/bloc.dart).
+[example](https://github.com/CallumIddon/bloc_generator/tree/master/example/lib/bloc.dart).
 
 ## Output Class
 
@@ -42,4 +42,4 @@ be a mapper or be triggered manually. You can find all the available services
 ## Example
 
 An extensive example can be found in the root
-[example/](https://github.com/CallumIddon/flutter_bloc_generator/tree/master/example) directory.
+[example/](https://github.com/CallumIddon/bloc_generator/tree/master/example) directory.

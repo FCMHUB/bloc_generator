@@ -1,8 +1,11 @@
+## 0.4.0
+
+* Change name from flutter_bloc_annotations to bloc_annotations
+
 ## 0.3.0
 
-* Removed AsyncMapperService
-* Made all mappers streams
-* Split out providers and disposer to flutter_bloc_provider package
+* Moved annotation inputs to Type from String where possible
+* Added BLoCTemplate and Service abstract classes for type safety
 
 ## 0.2.6
 
@@ -54,24 +57,26 @@
 
 ## 0.1.5
 
-* Made services public members
+* Updated service documentation
 
 ## 0.1.4
 
 * Changed Service to InputService and added OutputService
+* Corrected name in README
 
 ## 0.1.3
 
-* Format code
-* Add example
+* Fix README discrepencies
 
 ## 0.1.2
 
-* Fix latest value updater for initial data
+* Added documentation comments
 
 ## 0.1.1
 
-* Change analyzer dependency to ^0.33.0 for compatability
+* Fix library name
+* Add example
+* Format code
 
 ## 0.1.0
 

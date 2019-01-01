@@ -3,10 +3,10 @@ import "package:build/build.dart";
 import "package:analyzer/dart/element/element.dart";
 import "package:source_gen/source_gen.dart";
 
-import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
+import "package:bloc_annotations/bloc_annotations.dart";
 
-import "package:flutter_bloc_generator/src/classFinder.dart";
-import "package:flutter_bloc_generator/src/metadata.dart";
+import "package:bloc_generator/src/classFinder.dart";
+import "package:bloc_generator/src/metadata.dart";
 
 enum ServiceMetadataType { input, output, bloc, trigger, mapper }
 

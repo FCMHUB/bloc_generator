@@ -1,7 +1,7 @@
 import "dart:async";
 import "package:rxdart/rxdart.dart";
 import "package:flutter/material.dart";
-import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
+import "package:bloc_annotations/bloc_annotations.dart";
 import "package:flutter_bloc_example/services.dart";
 part "bloc.bloc.dart";
 

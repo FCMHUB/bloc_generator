@@ -23,4 +23,4 @@ will automatically call the dispose method on the provider when it loses context
 ## Example
 
 An extensive example can be found in the root
-[example/](https://github.com/CallumIddon/flutter_bloc_generator/tree/master/example) directory.
+[example/](https://github.com/CallumIddon/bloc_generator/tree/master/example) directory.

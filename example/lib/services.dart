@@ -1,5 +1,5 @@
 import "dart:async";
-import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
+import "package:bloc_annotations/bloc_annotations.dart";
 import "bloc.dart";
 
 class SetService extends InputService<int> {

@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:flutter_bloc_annotations/flutter_bloc_annotations.dart";
+import "package:bloc_annotations/bloc_annotations.dart";
 
 class BLoCProvider<BLoCT extends BLoCTemplate> extends InheritedWidget {
   final Widget child;
