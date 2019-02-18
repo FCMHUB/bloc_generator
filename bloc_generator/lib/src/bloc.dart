@@ -1,12 +1,29 @@
-import "dart:async";
-import "package:build/build.dart";
-import "package:analyzer/dart/element/element.dart";
-import "package:source_gen/source_gen.dart";
+// Copyright 2019 Callum Iddon
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-import "package:bloc_annotations/bloc_annotations.dart";
+import 'dart:async';
 
-import "package:bloc_generator/src/classFinder.dart";
-import "package:bloc_generator/src/metadata.dart";
+import 'package:analyzer/dart/element/element.dart';
+
+import 'package:build/build.dart';
+
+import 'package:source_gen/source_gen.dart';
+
+import 'package:bloc_annotations/bloc_annotations.dart';
+
+import 'package:bloc_generator/src/class_finder.dart';
+import 'package:bloc_generator/src/metadata.dart';
 
 enum ServiceMetadataType { input, output, bloc, trigger, mapper }
 
@@ -27,191 +44,193 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
   Stream<String> generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) async* {
     final String name =
-        element.name[0] == "_" ? element.name.substring(1) : element.name;
-    final String bloc = "${name}BLoC";
+        element.name[0] == '_' ? element.name.substring(1) : element.name;
+    final String bloc = '${name}BLoC';
 
-    List<ServiceMetadata> allServices = <ServiceMetadata>[];
-    if (findMetadata(element, "@BLoCRequireInputService")) {
+    final List<ServiceMetadata> allServices = <ServiceMetadata>[];
+    if (findMetadata(element, '@BLoCRequireInputService')) {
       allServices.add(ServiceMetadata(ServiceMetadataType.input,
-          getMetadata(element, "@BLoCRequireInputService")));
+          getMetadata(element, '@BLoCRequireInputService')));
     }
-    if (findMetadata(element, "@BLoCRequireOutputService")) {
+    if (findMetadata(element, '@BLoCRequireOutputService')) {
       allServices.add(ServiceMetadata(ServiceMetadataType.output,
-          getMetadata(element, "@BLoCRequireOutputService")));
+          getMetadata(element, '@BLoCRequireOutputService')));
     }
-    if (findMetadata(element, "@BLoCRequireBLoCService")) {
+    if (findMetadata(element, '@BLoCRequireBLoCService')) {
       allServices.add(ServiceMetadata(ServiceMetadataType.bloc,
-          getMetadata(element, "@BLoCRequireBLoCService")));
+          getMetadata(element, '@BLoCRequireBLoCService')));
     }
-    if (findMetadata(element, "@BLoCRequireTriggerService")) {
+    if (findMetadata(element, '@BLoCRequireTriggerService')) {
       allServices.add(ServiceMetadata(ServiceMetadataType.trigger,
-          getMetadata(element, "@BLoCRequireTriggerService")));
+          getMetadata(element, '@BLoCRequireTriggerService')));
     }
-    if (findMetadata(element, "@BLoCRequireMapperService")) {
+    if (findMetadata(element, '@BLoCRequireMapperService')) {
       allServices.add(ServiceMetadata(ServiceMetadataType.mapper,
-          getMetadata(element, "@BLoCRequireMapperService")));
+          getMetadata(element, '@BLoCRequireMapperService')));
     }
 
-    String services = "";
-    String servicesInit = "";
-    String servicesTrigger = "";
-    String servicesDispose = "";
+    final StringBuffer services = StringBuffer();
+    final StringBuffer servicesInit = StringBuffer();
+    final StringBuffer servicesTrigger = StringBuffer();
+    final StringBuffer servicesDispose = StringBuffer();
 
-    String mappers = "";
+    final StringBuffer mappers = StringBuffer('');
 
-    allServices.forEach((ServiceMetadata service) {
-      service.metadata.forEach((ElementAnnotation metadata) {
-        List<String> inputs = findInputs(metadata);
-        String serviceType = inputs[0];
-        String serviceName =
-            "${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}";
-        String inputName = service.type == ServiceMetadataType.bloc ||
+    for (final ServiceMetadata service in allServices) {
+      for (final ElementAnnotation metadata in service.metadata) {
+        final List<String> inputs = findInputs(metadata);
+        final String serviceType = inputs[0];
+        final String serviceName =
+            '${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}';
+        final String inputName = service.type == ServiceMetadataType.bloc ||
                 service.type == ServiceMetadataType.trigger
-            ? "this"
+            ? 'this'
             : inputs[1];
 
-        services += "$serviceType $serviceName = $serviceType();\n";
+        services.writeln('$serviceType $serviceName = $serviceType();\n');
 
         if (service.type != ServiceMetadataType.trigger &&
             service.type != ServiceMetadataType.mapper) {
-          servicesInit += "$serviceName.init($inputName);\n";
+          servicesInit.writeln('$serviceName.init($inputName);');
         } else if (service.type == ServiceMetadataType.mapper) {
-          mappers += """
-				_${inputs[1]}.stream.listen((inputData) {
-					$serviceName.map(inputData).forEach((newData) {
-						_${inputs[2]}.sink.add(newData);
-					});
-				});
-			""";
+          mappers.write('''
+            _${inputs[1]}.stream.listen((inputData) {
+              $serviceName.map(inputData).forEach((newData) {
+                _${inputs[2]}.sink.add(newData);
+              });
+            });
+         ''');
         } else if (service.type == ServiceMetadataType.trigger) {
-          final String triggerName = "trigger${serviceName[0].toUpperCase()}"
-              "${serviceName.substring(1)}";
-          servicesTrigger +=
-              "Future<void> $triggerName() async => await $serviceName.trigger(this);\n";
+          final String triggerName = 'trigger${serviceName[0].toUpperCase()}'
+              '${serviceName.substring(1)}';
+          servicesTrigger.writeln('Future<void> $triggerName() async => await '
+              '$serviceName.trigger(this);');
         }
-        servicesDispose += "$serviceName.dispose();\n";
-      });
-    });
+        servicesDispose.writeln('$serviceName.dispose();');
+      }
+    }
 
-    String controllers = "";
-    String controllersInit = "";
-    String controllersDisposer = "";
+    final StringBuffer controllers = StringBuffer('');
+    final StringBuffer controllersInit = StringBuffer('');
+    final StringBuffer controllersDisposer = StringBuffer('');
 
-    String values = "";
-    String valueUpdaters = "";
+    final StringBuffer values = StringBuffer('');
+    final StringBuffer valueUpdaters = StringBuffer('');
 
-    String paramaters = "";
-    String paramatersList = "";
-    String paramatersInit = "";
-    List<String> paramatersAssert = <String>[];
+    final StringBuffer paramaters = StringBuffer('');
+    final StringBuffer paramatersList = StringBuffer('');
+    final StringBuffer paramatersInit = StringBuffer('');
+    final List<String> paramatersAssert = <String>[];
 
-    Map<String, String> currentValues = <String, String>{};
+    final Map<String, String> currentValues = <String, String>{};
 
     element.visitChildren(ClassFinder(field: (Element element) {
-      String inputType = findType(element);
-      String inputName = findName(element);
+      final String inputType = findType(element);
+      final String inputName = findName(element);
 
-      bool isInput = findMetadata(element, "@BLoCInput");
-      bool isOutput = findMetadata(element, "@BLoCOutput");
-      bool isValue = findMetadata(element, "@BLoCValue");
-      bool isParamater = findMetadata(element, "@BLoCParamater");
+      final bool isInput = findMetadata(element, '@BLoCInput');
+      final bool isOutput = findMetadata(element, '@BLoCOutput');
+      final bool isValue = findMetadata(element, '@BLoCValue');
+      final bool isParamater = findMetadata(element, '@BLoCParamater');
 
       String templateType;
       if (isInput || isOutput) {
         templateType = findTemplateType(element);
       }
 
-      String name = inputName[0] == "_" ? inputName.substring(1) : inputName;
+      final String name =
+          inputName[0] == '_' ? inputName.substring(1) : inputName;
 
       if (isInput || isOutput) {
-        controllers += "$inputType _$inputName;\n";
-        controllersInit += "_$inputName = template.$inputName;\n";
+        controllers.writeln('$inputType _$inputName;');
+        controllersInit.writeln('_$inputName = template.$inputName;');
       } else if (isValue) {
-        values += "$inputType get $name => template.$inputName;\n\n";
+        values.writeln('$inputType get $name => template.$inputName;\n');
 
-        getMetadata(element, "@BLoCValue")
-            .forEach((ElementAnnotation metadata) {
-          String output = findInputs(metadata)[0];
+        for (final ElementAnnotation metadata
+            in getMetadata(element, '@BLoCValue')) {
+          final String output = findInputs(metadata)[0];
           currentValues[output] = name;
-          valueUpdaters += """
-								_$output.stream.listen((inputData) {
-									template.$inputName = inputData;
-								});
-							""";
-        });
+          valueUpdaters.write('''
+                _$output.stream.listen((inputData) {
+                  template.$inputName = inputData;
+                });
+              ''');
+        }
       } else if (isParamater) {
-        paramaters += "$inputType get $name => template.$name;";
-        paramatersList += "@required $inputType $name,\n";
-        paramatersInit += "template.$name = $name;\n";
-        paramatersAssert.add("$name != null");
+        paramaters.write('$inputType get $name => template.$name;');
+        paramatersList.writeln('$inputType $name,');
+        paramatersInit.writeln('template.$name = $name;');
+        paramatersAssert.add('$name != null');
       }
 
       if (isInput) {
-        controllers += "Sink<$templateType> get $name => _$inputName.sink;\n";
+        controllers
+            .writeln('Sink<$templateType> get $name => _$inputName.sink;');
       }
       if (isOutput) {
-        controllers +=
-            "Stream<$templateType> get $name => _$inputName.stream;\n";
+        controllers
+            .writeln('Stream<$templateType> get $name => _$inputName.stream;');
       }
 
       if (isInput || isOutput) {
-        controllers += "\n";
-        controllersDisposer += "_$inputName?.close();\n";
+        controllers.writeln();
+        controllersDisposer.writeln('_$inputName?.close();');
       }
     }, method: (Element element) {
-      if (findMetadata(element, "@BLoCMapper")) {
-        getMetadata(element, "@BLoCMapper")
-            .forEach((ElementAnnotation metadata) {
-          List<String> inputs = findInputs(metadata);
-          String name = findName(element);
+      if (findMetadata(element, '@BLoCMapper')) {
+        for (final ElementAnnotation metadata
+            in getMetadata(element, '@BLoCMapper')) {
+          final List<String> inputs = findInputs(metadata);
+          final String name = findName(element);
 
-          mappers += """
-						_${inputs[0]}.stream.listen((inputData) {
-							template.$name(inputData).forEach((newData) {
-								_${inputs[1]}.sink.add(newData);
-							});
-						});
-					""";
-        });
+          mappers.write('''
+            _${inputs[0]}.stream.listen((inputData) {
+              template.$name(inputData).forEach((newData) {
+                _${inputs[1]}.sink.add(newData);
+              });
+            });
+          ''');
+        }
       }
     }));
 
-    yield """
-			class $bloc extends BLoCTemplate {
-				${element.name} template = ${element.name}();
+    yield '''
+      class $bloc extends BLoCTemplate {
+        ${element.name} template = ${element.name}();
 
-				$services
+        $services
 
-				$controllers
+        $controllers
 
-				$values
+        $values
 
-				$paramaters
+        $paramaters
 
-				$servicesTrigger
+        $servicesTrigger
 
-				$bloc${paramatersList == "" ? "()" : """
-				({
-					$paramatersList
-				})
-				"""} {
-					$paramatersInit
+        $bloc${paramatersList.toString() == '' ? '()' : '''
+        ({
+          $paramatersList
+        })
+        '''} {
+          $paramatersInit
 
-					$controllersInit
+          $controllersInit
 
-					$valueUpdaters
+          $valueUpdaters
 
-					$mappers
+          $mappers
 
-					$servicesInit
-				}
+          $servicesInit
+        }
 
-				@override
-				void dispose() {
-					$servicesDispose
-					$controllersDisposer
-				}
-			}
-		""";
+        @override
+        void dispose() {
+          $servicesDispose
+          $controllersDisposer
+        }
+      }
+    ''';
   }
 }

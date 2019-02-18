@@ -1,3 +1,12 @@
+# Changelog
+
+## 0.5.0
+
+* Add Documentation
+* Refactor
+* Format
+* Add CI
+
 ## 0.4.0
 
 * Change name from flutter_bloc_annotations to bloc_annotations
@@ -9,7 +18,8 @@
 
 ## 0.2.6
 
-* Add MapperService, AsyncMapperService, RequireMapperService and RequireAsyncMapperService
+* Add MapperService, AsyncMapperService, RequireMapperService and
+RequireAsyncMapperService
 
 ## 0.2.5
 
@@ -26,7 +36,8 @@
 
 ## 0.2.2
 
-* Added paramaters that can be passed to the BLoC and are accessible to BLoC services
+* Added paramaters that can be passed to the BLoC and are accessible to BLoC
+services
 
 ## 0.2.1
 

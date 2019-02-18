@@ -12,17 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-targets:
-  $default:
-    builders:
-      flutter_bloc:
-        enabled: true
+task:
+  name: publish
+  only_if: $CIRRUS_BRANCH == "master"
 
-builders:
-  flutter_bloc:
-    import: "package:bloc_generator/bloc_generator.dart"
-    build_extensions: {".dart": [".bloc.dart"]}
-    builder_factories: ["bloc"]
-    auto_apply: dependents
-    build_to: source
-    applies_builders: ["source_gen|combining_builder"]
+  container:
+    image: cirrusci/flutter:1.0.0
+
+  env:
+    matrix:
+      - DIR: bloc_annotations
+      - DIR: bloc_generator
+      - DIR: flutter_bloc_provider
+
+  copy_example_script: cp -r example $DIR
+
+  script:
+    - cd $DIR
+    - yes | flutter packages pub publish
