@@ -13,6 +13,14 @@
 # limitations under the License.
 
 task:
+  name: doctor
+
+  container:
+    image: cirrusci/flutter:1.0.0
+
+  script: flutter doctor
+
+task:
   name: publish
   only_if: $CIRRUS_BRANCH == "master"
 
@@ -20,12 +28,18 @@ task:
     image: cirrusci/flutter:1.0.0
 
   env:
+    ACCESS_TOKEN: ENCRYPTED[9135cf410d8c22975751eece9b72b561cca71225dfcea03c6f85dc8c8922816d873573dcaaec1b2b6246995cbdc79f53]
+    REFRESH_TOKEN: ENCRYPTED[0e94095b03d5bc1c8887159c4415c70b965637be7c4c94c1357ba26b32c105e661bfb1d19a751a091e43a3e0be5a3c32]
+    TOKEN_EXPIRATION: ENCRYPTED[68bbeed39fa66b90e567a9c3437090fbba0310f01e9e435c2d7b4474dbeb4b43dc5649ac9bdfc1028c860ed28625bca9]
+
     matrix:
       - DIR: bloc_annotations
       - DIR: bloc_generator
       - DIR: flutter_bloc_provider
 
-  copy_example_script: cp -r example $DIR
+  copy_script: cp -r example CHANGELOG.md LICENSE $DIR
+
+  credentials_script: ./ci/create_credentials.sh
 
   script:
     - cd $DIR
