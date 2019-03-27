@@ -1,5 +1,7 @@
 # bloc_generator
 
+![Build Status](https://img.shields.io/badge/Ci-passing-success.svg)
+
 bloc_generator is a combination of three packages.
 
 [bloc_annotations](https://github.com/CallumIddon/bloc_generator/tree/master/bloc_annotations)
