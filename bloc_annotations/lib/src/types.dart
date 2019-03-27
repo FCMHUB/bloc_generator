@@ -18,7 +18,7 @@ import 'package:meta/meta.dart';
 
 // ignore: one_member_abstracts
 abstract class BLoCTemplate {
-  void dispose();
+  void dispose() {}
 }
 
 abstract class Service {

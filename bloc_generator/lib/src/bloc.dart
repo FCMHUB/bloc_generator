@@ -87,7 +87,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
             ? 'this'
             : inputs[1];
 
-        services.writeln('$serviceType $serviceName = $serviceType();\n');
+        services.writeln('final $serviceType $serviceName = $serviceType();\n');
 
         if (service.type != ServiceMetadataType.trigger &&
             service.type != ServiceMetadataType.mapper) {
@@ -110,17 +110,24 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       }
     }
 
+    final StringBuffer parameters = StringBuffer('');
+    final StringBuffer parametersList = StringBuffer('');
+    final StringBuffer namedParameters = StringBuffer('');
+
+    for (final ElementAnnotation metadata in element.metadata) {
+      if (metadata.toString().contains('@BLoCParameter')) {
+        final String parameterType = findInputs(metadata)[0];
+        final String parameterName = findInputs(metadata)[1];
+        parametersList.writeln('$parameterType $parameterName,');
+        namedParameters.writeln('$parameterName: $parameterName,');
+      }
+    }
+
     final StringBuffer controllers = StringBuffer('');
-    final StringBuffer controllersInit = StringBuffer('');
     final StringBuffer controllersDisposer = StringBuffer('');
 
     final StringBuffer values = StringBuffer('');
     final StringBuffer valueUpdaters = StringBuffer('');
-
-    final StringBuffer paramaters = StringBuffer('');
-    final StringBuffer paramatersList = StringBuffer('');
-    final StringBuffer paramatersInit = StringBuffer('');
-    final List<String> paramatersAssert = <String>[];
 
     final Map<String, String> currentValues = <String, String>{};
 
@@ -131,7 +138,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       final bool isInput = findMetadata(element, '@BLoCInput');
       final bool isOutput = findMetadata(element, '@BLoCOutput');
       final bool isValue = findMetadata(element, '@BLoCValue');
-      final bool isParamater = findMetadata(element, '@BLoCParamater');
+      final bool isExported = findMetadata(element, '@BLoCExportMember');
 
       String templateType;
       if (isInput || isOutput) {
@@ -142,8 +149,8 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
           inputName[0] == '_' ? inputName.substring(1) : inputName;
 
       if (isInput || isOutput) {
-        controllers.writeln('$inputType _$inputName;');
-        controllersInit.writeln('_$inputName = template.$inputName;');
+        controllers
+            .writeln('$inputType get _$inputName => template.$inputName;');
       } else if (isValue) {
         values.writeln('$inputType get $name => template.$inputName;\n');
 
@@ -157,11 +164,6 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
                 });
               ''');
         }
-      } else if (isParamater) {
-        paramaters.write('$inputType get $name => template.$name;');
-        paramatersList.writeln('$inputType $name,');
-        paramatersInit.writeln('template.$name = $name;');
-        paramatersAssert.add('$name != null');
       }
 
       if (isInput) {
@@ -176,6 +178,10 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       if (isInput || isOutput) {
         controllers.writeln();
         controllersDisposer.writeln('_$inputName?.close();');
+      }
+
+      if (isExported) {
+        parameters.writeln('$inputType get $inputName => template.$inputName;');
       }
     }, method: (Element element) {
       if (findMetadata(element, '@BLoCMapper')) {
@@ -197,7 +203,9 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
     yield '''
       class $bloc extends BLoCTemplate {
-        ${element.name} template = ${element.name}();
+        final ${element.name} template;
+
+        $parameters
 
         $services
 
@@ -205,19 +213,13 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
         $values
 
-        $paramaters
-
         $servicesTrigger
 
-        $bloc${paramatersList.toString() == '' ? '()' : '''
+        $bloc${parametersList.toString() == '' ? '()' : '''
         ({
-          $paramatersList
+          $parametersList
         })
-        '''} {
-          $paramatersInit
-
-          $controllersInit
-
+        '''} : template = ${element.name}($namedParameters) {
           $valueUpdaters
 
           $mappers
@@ -227,6 +229,8 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
         @override
         void dispose() {
+          template.dispose();
+
           $servicesDispose
           $controllersDisposer
         }

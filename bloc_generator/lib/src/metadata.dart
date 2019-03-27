@@ -45,10 +45,10 @@ List<String> findInputs(ElementAnnotation metadata) => metadata
         .split(', ')
         .map((String input) {
       String output = input;
-      if (output.startsWith('\'')) {
+      if (output.startsWith('\'') || output.startsWith('"')) {
         output = output.substring(1);
       }
-      if (output.endsWith('\'')) {
+      if (output.endsWith('\'') || output.endsWith('"')) {
         output = output.substring(0, output.length - 1);
       }
       return output;

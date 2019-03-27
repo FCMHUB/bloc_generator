@@ -23,14 +23,17 @@ import 'package:flutter_bloc_example/services.dart';
 part 'bloc.bloc.dart';
 
 @BLoC()
+@BLoCParameter(int, 'maxValue')
 @BLoCRequireInputService(SetService, 'setCounter')
 @BLoCRequireOutputService(PrintService, 'counter')
 @BLoCRequireBLoCService(MaxService)
 @BLoCRequireTriggerService(UrlService)
 @BLoCRequireMapperService(StringifyMapper, 'setCounter', 'counter')
-class _Test {
-  @BLoCParamater()
+class _Test extends BLoCTemplate {
+  @BLoCExportMember()
   int maxValue;
+
+  _Test({this.maxValue});
 
   @BLoCInput()
   StreamController<int> setCounter = StreamController<int>();

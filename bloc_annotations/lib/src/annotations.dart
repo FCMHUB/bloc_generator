@@ -35,10 +35,22 @@ class BLoCValue {
   const BLoCValue(this.outputName) : assert(outputName != null);
 }
 
-/// A paramater that will need to be added to the BLoC class and provided to the
-/// BLoC either directly or through a provider or disposer.
-class BLoCParamater {
-  const BLoCParamater();
+/// A parameter that will need to be added to the BLoC class and provided to the
+/// BLoC either directly or through a provider or disposer. The parameter will
+/// be passed to the constructor of the BLoC with a nameed parameter of [name].
+class BLoCParameter {
+  /// Type the provided parameter must be.
+  final Type type;
+
+  /// Name to give the parameter when passed to the constructor.
+  final String name;
+
+  const BLoCParameter(this.type, this.name);
+}
+
+/// Allows a member variable to be accessible through the generated BLoC class.
+class BLoCExportMember {
+  const BLoCExportMember();
 }
 
 /// Specifies a BLoC class member that will be called when data is added to the

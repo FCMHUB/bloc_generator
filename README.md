@@ -29,11 +29,11 @@ Mappers bridge inputs and outputs by yielding any values that is to be added to
 the output `Stream` while taking one input, the value that was added to the
 input `Sink`.
 
-### Paramaters
+### Parameters
 
-Paramaters are values that are passed to the BLoC when it is initialized. This
+Parameters are values that are passed to the BLoC when it is initialized. This
 allows mappers and services to be able to change their behaviour based on the
-provided paramaters.
+provided parameters.
 
 ### Services
 
