@@ -41,32 +41,25 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
   BLoCGenerator(this.options);
 
   @override
-  Stream<String> generateForAnnotatedElement(
-      Element element, ConstantReader annotation, BuildStep buildStep) async* {
-    final String name =
-        element.name[0] == '_' ? element.name.substring(1) : element.name;
+  Stream<String> generateForAnnotatedElement(Element element, ConstantReader annotation, BuildStep buildStep) async* {
+    final String name = element.name[0] == '_' ? element.name.substring(1) : element.name;
     final String bloc = '${name}BLoC';
 
     final List<ServiceMetadata> allServices = <ServiceMetadata>[];
     if (findMetadata(element, '@BLoCRequireInputService')) {
-      allServices.add(ServiceMetadata(ServiceMetadataType.input,
-          getMetadata(element, '@BLoCRequireInputService')));
+      allServices.add(ServiceMetadata(ServiceMetadataType.input, getMetadata(element, '@BLoCRequireInputService')));
     }
     if (findMetadata(element, '@BLoCRequireOutputService')) {
-      allServices.add(ServiceMetadata(ServiceMetadataType.output,
-          getMetadata(element, '@BLoCRequireOutputService')));
+      allServices.add(ServiceMetadata(ServiceMetadataType.output, getMetadata(element, '@BLoCRequireOutputService')));
     }
     if (findMetadata(element, '@BLoCRequireBLoCService')) {
-      allServices.add(ServiceMetadata(ServiceMetadataType.bloc,
-          getMetadata(element, '@BLoCRequireBLoCService')));
+      allServices.add(ServiceMetadata(ServiceMetadataType.bloc, getMetadata(element, '@BLoCRequireBLoCService')));
     }
     if (findMetadata(element, '@BLoCRequireTriggerService')) {
-      allServices.add(ServiceMetadata(ServiceMetadataType.trigger,
-          getMetadata(element, '@BLoCRequireTriggerService')));
+      allServices.add(ServiceMetadata(ServiceMetadataType.trigger, getMetadata(element, '@BLoCRequireTriggerService')));
     }
     if (findMetadata(element, '@BLoCRequireMapperService')) {
-      allServices.add(ServiceMetadata(ServiceMetadataType.mapper,
-          getMetadata(element, '@BLoCRequireMapperService')));
+      allServices.add(ServiceMetadata(ServiceMetadataType.mapper, getMetadata(element, '@BLoCRequireMapperService')));
     }
 
     final StringBuffer services = StringBuffer();
@@ -80,17 +73,14 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       for (final ElementAnnotation metadata in service.metadata) {
         final List<String> inputs = findInputs(metadata);
         final String serviceType = inputs[0];
-        final String serviceName =
-            '${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}';
-        final String inputName = service.type == ServiceMetadataType.bloc ||
-                service.type == ServiceMetadataType.trigger
+        final String serviceName = '${inputs[0][0].toLowerCase()}${inputs[0].substring(1)}';
+        final String inputName = service.type == ServiceMetadataType.bloc || service.type == ServiceMetadataType.trigger
             ? 'this'
             : inputs[1];
 
         services.writeln('final $serviceType $serviceName = $serviceType();\n');
 
-        if (service.type != ServiceMetadataType.trigger &&
-            service.type != ServiceMetadataType.mapper) {
+        if (service.type != ServiceMetadataType.trigger && service.type != ServiceMetadataType.mapper) {
           servicesInit.writeln('$serviceName.init($inputName);');
         } else if (service.type == ServiceMetadataType.mapper) {
           mappers.write('''
@@ -137,25 +127,23 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
 
       final bool isInput = findMetadata(element, '@BLoCInput');
       final bool isOutput = findMetadata(element, '@BLoCOutput');
+      final bool isInputOutput = findMetadata(element, '@BLoCInOut');
       final bool isValue = findMetadata(element, '@BLoCValue');
       final bool isExported = findMetadata(element, '@BLoCExportMember');
 
       String templateType;
-      if (isInput || isOutput) {
+      if (isInput || isOutput || isInputOutput) {
         templateType = findTemplateType(element);
       }
 
-      final String name =
-          inputName[0] == '_' ? inputName.substring(1) : inputName;
+      final String name = inputName[0] == '_' ? inputName.substring(1) : inputName;
 
-      if (isInput || isOutput) {
-        controllers
-            .writeln('$inputType get _$inputName => template.$inputName;');
+      if (isInput || isOutput || isInputOutput) {
+        controllers.writeln('$inputType get _$inputName => template.$inputName;');
       } else if (isValue) {
         values.writeln('$inputType get $name => template.$inputName;\n');
 
-        for (final ElementAnnotation metadata
-            in getMetadata(element, '@BLoCValue')) {
+        for (final ElementAnnotation metadata in getMetadata(element, '@BLoCValue')) {
           final String output = findInputs(metadata)[0];
           currentValues[output] = name;
           valueUpdaters.write('''
@@ -167,15 +155,20 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       }
 
       if (isInput) {
-        controllers
-            .writeln('Sink<$templateType> get $name => _$inputName.sink;');
+        controllers.writeln('Sink<$templateType> get $name => _$inputName.sink;');
       }
-      if (isOutput) {
-        controllers
-            .writeln('Stream<$templateType> get $name => _$inputName.stream;');
+      if (isOutput || isInputOutput) {
+        controllers.writeln('Stream<$templateType> get $name => _$inputName.stream;');
       }
 
-      if (isInput || isOutput) {
+      if (isInputOutput) {
+        controllers
+            .writeln('Sink<$templateType> get set${name[0].toUpperCase()}${name.substring(1)} => _$inputName.sink;');
+        controllers
+            .writeln('$templateType get current${name[0].toUpperCase()}${name.substring(1)} => _$inputName.value;');
+      }
+
+      if (isInput || isOutput || isInputOutput) {
         controllers.writeln();
         controllersDisposer.writeln('_$inputName?.close();');
       }
@@ -185,8 +178,7 @@ class BLoCGenerator extends GeneratorForAnnotation<BLoC> {
       }
     }, method: (Element element) {
       if (findMetadata(element, '@BLoCMapper')) {
-        for (final ElementAnnotation metadata
-            in getMetadata(element, '@BLoCMapper')) {
+        for (final ElementAnnotation metadata in getMetadata(element, '@BLoCMapper')) {
           final List<String> inputs = findInputs(metadata);
           final String name = findName(element);
 

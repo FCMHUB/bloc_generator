@@ -13,4 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  bloc_annotations: 0.5.0
+  bloc_annotations:
+    git:
+      url: https://github.com/FCMHUB/bloc_generator
+      path: bloc_annotations
+      ref: master

@@ -28,26 +28,26 @@ part 'bloc.bloc.dart';
 @BLoCRequireOutputService(PrintService, 'counter')
 @BLoCRequireBLoCService(MaxService)
 @BLoCRequireTriggerService(UrlService)
-@BLoCRequireMapperService(StringifyMapper, 'setCounter', 'counter')
+//@BLoCRequireMapperService(StringifyMapper, 'setCounter', 'counter')
 class _Test extends BLoCTemplate {
   @BLoCExportMember()
   int maxValue;
 
   _Test({this.maxValue});
 
-  @BLoCInput()
-  StreamController<int> setCounter = StreamController<int>();
-  @BLoCInput()
-  StreamController<int> addToCounter = StreamController<int>();
+//  @BLoCInput()
+//  StreamController<int> setCounter = StreamController<int>();
+//  @BLoCInput()
+//  StreamController<int> addToCounter = StreamController<int>();
 
-  @BLoCOutput()
+  @BLoCInOut()
   BehaviorSubject<String> counter = BehaviorSubject<String>(seedValue: '0');
 
-  @BLoCValue('counter')
-  String currentCounter;
+//  @BLoCValue('counter')
+//  String currentCounter;
 
-  @BLoCMapper('addToCounter', 'counter')
-  Stream<String> setAddToCounterBLoC(int inputData) async* {
-    yield (int.parse(currentCounter) + inputData).toString();
-  }
+//  @BLoCMapper('addToCounter', 'counter')
+//  Stream<String> setAddToCounterBLoC(int inputData) async* {
+//    yield (int.parse(currentCounter) + inputData).toString();
+//  }
 }

@@ -13,8 +13,17 @@ dependencies:
 
   rxdart: ^0.19.0
 
-  bloc_annotations: 0.5.0
-  flutter_bloc_provider: 0.5.0
+  bloc_annotations:
+    git:
+      url: https://github.com/FCMHUB/bloc_generator
+      path: bloc_annotations
+      ref: master
+
+  flutter_bloc_provider:
+    git:
+      url: https://github.com/FCMHUB/bloc_generator
+      path: flutter_bloc_provider
+      ref: master
 
 dev_dependencies:
   flutter_test:
@@ -22,7 +31,11 @@ dev_dependencies:
 
   build_runner: 1.0.0
 
-  bloc_generator: 0.5.0
+  bloc_generator:
+    git:
+      url: https://github.com/FCMHUB/bloc_generator
+      path: bloc_generator
+      ref: master
 
 flutter:
   uses-material-design: true

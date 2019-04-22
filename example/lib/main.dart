@@ -28,8 +28,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: BLoCDisposer<TestBLoC>(
-          bloc: TestBLoC(maxValue: 20),
-          child: const MyHomePage(title: 'Flutter Demo Home Page')));
+          bloc: TestBLoC(maxValue: 20), child: const MyHomePage(title: 'Flutter Demo Home Page')));
 }
 
 class MyHomePage extends StatelessWidget {
@@ -45,36 +44,26 @@ class MyHomePage extends StatelessWidget {
           title: Text(title),
         ),
         body: Center(
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-              const Text('You have pushed the button this many times:'),
-              StreamBuilder<String>(
-                  stream: bloc.counter,
-                  builder:
-                      (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    if (!snapshot.hasData) {
-                      return Container();
-                    }
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          const Text('You have pushed the button this many times:'),
+          StreamBuilder<String>(
+              stream: bloc.counter,
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                if (!snapshot.hasData) {
+                  return Container();
+                }
 
-                    return Column(children: <Widget>[
-                      Text(snapshot.data,
-                          style: Theme.of(context).textTheme.display1),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            MaterialButton(
-                                child: const Text('Reset Counter'),
-                                onPressed: () => bloc.setCounter.add(0)),
-                            MaterialButton(
-                                child: const Text('Trigger Url Service'),
-                                onPressed: bloc.triggerUrlService)
-                          ])
-                    ]);
-                  }),
-            ])),
+                return Column(children: <Widget>[
+                  Text(snapshot.data, style: Theme.of(context).textTheme.display1),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                    MaterialButton(child: const Text('Reset Counter'), onPressed: () => bloc.setCounter.add('0')),
+                    MaterialButton(child: const Text('Trigger Url Service'), onPressed: bloc.triggerUrlService)
+                  ])
+                ]);
+              }),
+        ])),
         floatingActionButton: FloatingActionButton(
-            onPressed: () => bloc.addToCounter.add(1),
+            onPressed: () => bloc.setCounter.add((int.parse(bloc.currentCounter) + 1).toString()),
             tooltip: 'Increment',
             child: const Icon(Icons.add)));
   }

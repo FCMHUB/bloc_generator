@@ -27,6 +27,12 @@ class BLoCOutput {
   const BLoCOutput();
 }
 
+/// Specifies a BLoC class member is a straight input -> output value.
+/// Besides the output, it also generates the setValue (sink) and the currentValue
+class BLoCInOut {
+  const BLoCInOut();
+}
+
 /// Specifies a BLoC class member will store the last value of an output stream
 /// called [outputName].
 class BLoCValue {
